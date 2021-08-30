@@ -1,11 +1,29 @@
+lazy val publishSettings = Seq(
+  Test / publishArtifact := false,
+  pomIncludeRepository   := (_ => false),
+  organization           := "io.laserdisc",
+  homepage               := Some(url("http://laserdisc.io/slack4s")),
+  developers := List(
+    Developer("barryoneill", "Barry O'Neill", "", url("https://github.com/barryoneill"))
+  ),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/laserdisc-io/slack4s/tree/master"),
+      "scm:git:git@github.com:laserdisc-io/slack4s.git",
+      "scm:git:git@github.com:laserdisc-io/slack4s.git"
+    )
+  ),
+  licenses := Seq(
+    "MIT" -> url("https://raw.githubusercontent.com/laserdisc-io/slack4s/master/LICENSE")
+  )
+)
+
 lazy val root = project
   .in(file("."))
   .settings(
-    name         := "slack4s",
-    organization := "io.laserdisc",
+    name := "slack4s",
     Seq(
       scalaVersion := "2.13.6",
-      homepage     := Some(url("https://github.com/laserdisc-io/slack4s")),
       addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
       scalacOptions ++= Seq(
         "-encoding",
@@ -35,6 +53,6 @@ lazy val root = project
     buildInfoPackage        := "slack4s",
     addCommandAlias("format", ";scalafmtAll;scalafmtSbt"),
     addCommandAlias("checkFormat", ";scalafmtCheckAll;scalafmtSbtCheck"),
-    addCommandAlias("build", ";checkFormat;clean;test")
+    addCommandAlias("fullTest", ";clean;coverage;test;coverageReport")
   )
   .enablePlugins(BuildInfoPlugin, GitVersioning)
