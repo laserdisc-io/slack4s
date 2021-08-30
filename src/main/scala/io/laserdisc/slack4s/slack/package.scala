@@ -43,20 +43,19 @@ package object slack {
       .build()
 
   def markdownWithImgSection(
-                              markdown: String,
-                              imageUrl: URL,
-                              imageAlt: String
-                            ): LayoutBlock =
+    markdown: String,
+    imageUrl: URL,
+    imageAlt: String
+  ): LayoutBlock =
     markdownWithImgSection(markdown, imageUrl, imageAlt, Seq.empty)
 
-
   def markdownWithImgSection(
-                       markdown: String,
-                       imageUrl: URL,
-                       imageAlt: String,
-                       fieldsHead: String,
-                       fieldsTail: String*
-                     ): LayoutBlock =
+    markdown: String,
+    imageUrl: URL,
+    imageAlt: String,
+    fieldsHead: String,
+    fieldsTail: String*
+  ): LayoutBlock =
     markdownWithImgSection(markdown, imageUrl, imageAlt, fieldsHead +: fieldsTail)
 
   def markdownWithImgSection(
@@ -71,7 +70,7 @@ package object slack {
       .text(markdownElement(markdown))
       .accessory(imageElement(imageUrl.value, imageAlt))
 
-    if(fields.isEmpty) {
+    if (fields.isEmpty) {
       builder.build()
     } else {
       builder.fields(fields.map[TextObject](markdownElement).asJava).build()

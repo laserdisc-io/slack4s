@@ -19,7 +19,6 @@ package object internal {
     gsonBuilder.create()
   }
 
-
   // slack responds with a body of just "ok" on success
   implicit def responseAcceptedDecoder[F[_]: Sync]: EntityDecoder[F, SlackResponseAccepted] =
     EntityDecoder.text.map {
@@ -64,6 +63,5 @@ package object internal {
 
   implicit def postMsgReqHttp4sEncoder[F[_]: Sync]: EntityEncoder[F, ChatPostMessageRequest] =
     jsonEncoderOf[F, ChatPostMessageRequest]
-
 
 }

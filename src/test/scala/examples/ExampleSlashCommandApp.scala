@@ -16,7 +16,7 @@ import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import java.time.Instant
 import scala.concurrent.ExecutionContext.global
 
-object ExampleBot extends IOApp {
+object ExampleSlashCommandApp extends IOApp {
 
   val secret: SigningSecret = "in the real world you wouldn't hardcode secrets...right?"
 

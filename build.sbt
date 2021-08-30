@@ -5,7 +5,7 @@ lazy val root = project
     organization := "io.laserdisc",
     Seq(
       scalaVersion := "2.13.6",
-      homepage     := Some(url("https://github.com/laserdisc-io/sc-slack")),
+      homepage     := Some(url("https://github.com/laserdisc-io/slack4s")),
       addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
       scalacOptions ++= Seq(
         "-encoding",
@@ -16,8 +16,8 @@ lazy val root = project
         "-language:higherKinds",
         "-language:implicitConversions",
         "-language:postfixOps",
-        "-Xlint"
-//        "-Xfatal-warnings"
+        "-Xlint:_,-byname-implicit", // see https://github.com/scala/bug/issues/12072
+        "-Xfatal-warnings"
       )
     ),
     Test / fork := true,

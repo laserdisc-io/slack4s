@@ -30,4 +30,5 @@ package object canned {
         s"""This is a placeholder message, in response to your input `${payload.getText}`.
            |Visit the <$ProjectRepo|the slack4s homepage> for more information on how to write a custom handler.""".stripMargin
       )
-    )}
+    )
+}

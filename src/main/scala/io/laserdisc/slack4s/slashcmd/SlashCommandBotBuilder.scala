@@ -1,6 +1,6 @@
 package io.laserdisc.slack4s.slashcmd
 
-import cats.effect.{ConcurrentEffect, _}
+import cats.effect.{ ConcurrentEffect, _ }
 import cats.implicits._
 import eu.timepit.refined.auto._
 import io.laserdisc.slack4s.internal._
@@ -12,7 +12,7 @@ import org.http4s._
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import org.http4s.server.{Router, ServiceErrorHandler}
+import org.http4s.server.{ Router, ServiceErrorHandler }
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import slack4s.BuildInfo
@@ -37,12 +37,12 @@ object SlashCommandBotBuilder {
 }
 
 class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
-                                                                      signingSecret: SigningSecret,
-                                                                      ec: ExecutionContext = Defaults.ExecutionCtx,
-                                                                      bindPort: BindPort = Defaults.BindPort,
-                                                                      bindAddress: BindAddress = Defaults.BindAddress,
-                                                                      commandParser: Option[CommandMapper[F]] = None,
-                                                                      http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
+  signingSecret: SigningSecret,
+  ec: ExecutionContext = Defaults.ExecutionCtx,
+  bindPort: BindPort = Defaults.BindPort,
+  bindAddress: BindAddress = Defaults.BindAddress,
+  commandParser: Option[CommandMapper[F]] = None,
+  http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
 ) {
   type Self = SlashCommandBotBuilder[F]
 
@@ -52,12 +52,12 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
   import dsl._
 
   private[this] def copy(
-                          ec: ExecutionContext = ec,
-                          signingSecret: SigningSecret = signingSecret,
-                          bindPort: BindPort = bindPort,
-                          bindAddress: BindAddress = bindAddress,
-                          commandParser: Option[CommandMapper[F]] = commandParser,
-                          http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
+    ec: ExecutionContext = ec,
+    signingSecret: SigningSecret = signingSecret,
+    bindPort: BindPort = bindPort,
+    bindAddress: BindAddress = bindAddress,
+    commandParser: Option[CommandMapper[F]] = commandParser,
+    http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
   ): Self =
     new SlashCommandBotBuilder(
       ec = ec,
@@ -98,7 +98,6 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
       }
 
   def serveF: F[ExitCode] = serve.compile.lastOrError
-
 
   final val Banner = {
     val msg = s"Starting slack4s v${BuildInfo.version}"

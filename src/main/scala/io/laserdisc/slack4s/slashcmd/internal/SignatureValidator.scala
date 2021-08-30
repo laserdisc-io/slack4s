@@ -1,5 +1,5 @@
 package io.laserdisc.slack4s.slashcmd.internal
-import cats.data.{Kleisli, OptionT}
+import cats.data.{ Kleisli, OptionT }
 import cats.effect.Sync
 import cats.implicits._
 import com.slack.api.app_backend.SlackSignature

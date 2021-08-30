@@ -5,15 +5,13 @@ object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest"               % "3.2.9"   % Test,
-      "org.mockito"   %% "mockito-scala-scalatest" % "1.16.37" % Test,
-      "org.mockito"   %% "mockito-scala-cats"      % "1.16.37" % Test,
-      "org.mockito"   % "mockito-core"             % "3.12.1"  % Test
+      "org.scalatest" %% "scalatest"   % "3.2.9"  % Test,
+      "org.mockito"   % "mockito-core" % "3.12.4" % Test
     )
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.10.0"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.11.0"
   )
 
   val Refined = Seq(
