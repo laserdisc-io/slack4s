@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+<!--            <pattern>%date %highlight(%level) [%logger{0}/%thread] %message%n%xException</pattern>-->
+            <pattern>%date %highlight(%level) %logger{3} [%thread] %message%n%xException</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT" />
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="ASYNCSTDOUT" />
+    </root>
+
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <logger name="io.laserdisc" level="DEBUG" />
+
+    <!-- useful when troubleshooting kinesis -->
+    <logger name="com.amazonaws" level="ERROR" />
+    <logger name="software.amazon" level="ERROR" />
+
+    <logger name="org.http4s" level="INFO" />
+    <logger name="org.apache.http" level="ERROR" />
+    <logger name="ch.qos.logback" level="ERROR" />
+    <logger name="io.netty" level="ERROR" />
+    <logger name="o.a.h.i.c." level="ERROR" />
+    <logger name="org.jdbcdslog" level="ERROR"/>
+
+</configuration>

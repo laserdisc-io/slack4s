@@ -1,0 +1,9 @@
+.terraform/
+target/
+.idea/
+.idea/*
+*.iml
+.bloop/
+.bsp/
+.jvmopts
+.DS_Store
