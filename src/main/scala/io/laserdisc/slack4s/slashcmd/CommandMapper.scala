@@ -18,7 +18,7 @@ object CommandMapper {
             s"Responding with default message; To configure your own processor, see $ProjectRepo"
           )
           .as(helloFromSlack4s(payload)),
-        respondImmediately = true,
+        respondInline = true,
         logToken = "GETTING-STARTED"
       )
 

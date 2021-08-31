@@ -84,7 +84,7 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
         CommandRunner[F](slackApiClient, commandParser.getOrElse(CommandMapper.default[F]))
       )
       .flatMap { cmdRunner =>
-        cmdRunner.backgroundRunner
+        cmdRunner.processBGCommandQueue
           .concurrently(
             http4sBuilder(
               BlazeServerBuilder[F](ec)
@@ -134,7 +134,7 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
       RouteNames.SLACK -> withValidSignature(signingSecret).apply(
         AuthedRoutes.of[SlackUser, F] {
           case req @ POST -> Root / SLACK_SLASH_COMMAND as _ =>
-            cmdRunner.acceptCommand(req)
+            cmdRunner.processRequest(req)
         }
       )
     ).orNotFound

@@ -30,21 +30,22 @@ object ExampleSlashCommandApp extends IOApp {
       case "" =>
         Command(
           handler = IO.pure(slackMessage(headerSection("Please provide a search term!"))),
-          respondImmediately = true
+          respondInline = true
         )
       case searchTerm =>
         Command(
           handler = querySpaceNews(searchTerm).map {
             case Seq() =>
               slackMessage(
-                headerSection(s"No results for: $searchTerm")
+                headerSection(s"No results for: $searchTerm"),
               )
             case articles =>
               slackMessage(
                 headerSection(s"Space news results for: $searchTerm")
                   +: articles.flatMap(formatNewsArticle)
               )
-          }
+          },
+          respondInline = false
         )
     }
   }

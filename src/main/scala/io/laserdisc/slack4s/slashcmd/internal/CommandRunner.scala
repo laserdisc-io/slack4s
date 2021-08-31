@@ -23,15 +23,15 @@ object CommandRunner {
   ): F[CommandRunner[F]] =
     Queue
       .unbounded[F, (SlashCommandPayload, Command[F])]
-      .map(new CommandHandlerImpl[F](slack, mapper, _))
+      .map(new CommandRunnerImpl[F](slack, mapper, _))
 }
 
 sealed trait CommandRunner[F[_]] {
-  def acceptCommand(ar: AuthedRequest[F, SlackUser]): F[Response[F]]
-  def backgroundRunner: fs2.Stream[F, Unit]
+  def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]]
+  def processBGCommandQueue: fs2.Stream[F, Unit]
 }
 
-class CommandHandlerImpl[F[_]: Concurrent](
+class CommandRunnerImpl[F[_]: Concurrent](
   slack: SlackAPIClient[F],
   mapper: CommandMapper[F],
   queue: Queue[F, (SlashCommandPayload, Command[F])]
@@ -64,7 +64,7 @@ class CommandHandlerImpl[F[_]: Concurrent](
     }
   }
 
-  override def backgroundRunner: fs2.Stream[F, Unit] =
+  override def processBGCommandQueue: fs2.Stream[F, Unit] =
     queue.dequeue
       .evalMap {
         case (payload, cmd) =>
@@ -87,15 +87,15 @@ class CommandHandlerImpl[F[_]: Concurrent](
   def executeLater(payload: SlashCommandPayload, cmd: Command[F]): F[Response[F]] =
     queue.enqueue1((payload, cmd)).as(Response(Status.Ok).withEntity(warnSlow))
 
-  override def acceptCommand(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
+  override def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
     ar.req.decode[SlashCommandPayload] { payload =>
       for {
         _   <- logger.info(s"PARSE-CMD reqId=${payload.requestId}  payload:'$payload'")
         cmd = mapper(payload)
         _ <- logger.info(
-              s"COMMAND-SELECT cmd:${cmd.logToken} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' respondImmediately:${cmd.respondImmediately}"
+              s"COMMAND-SELECT cmd:${cmd.logToken} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' respondImmediately:${cmd.respondInline}"
             )
-        res <- if (cmd.respondImmediately) executeNow(cmd) else executeLater(payload, cmd)
+        res <- if (cmd.respondInline) executeNow(cmd) else executeLater(payload, cmd)
       } yield res
     }
 

@@ -4,9 +4,9 @@ import eu.timepit.refined.auto._
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 
 case class Command[F[_]](
-  handler: F[ChatPostMessageRequest],
-  respondImmediately: Boolean = false,
-  logToken: LogToken = "NA"
+                          handler: F[ChatPostMessageRequest],
+                          respondInline: Boolean,
+                          logToken: LogToken = "NA"
 )
 
 sealed trait AuthError                                                      extends Throwable

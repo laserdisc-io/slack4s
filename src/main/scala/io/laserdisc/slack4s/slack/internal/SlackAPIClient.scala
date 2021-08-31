@@ -1,5 +1,6 @@
 package io.laserdisc.slack4s.slack.internal
 
+import cats.effect.concurrent.Ref
 import cats.effect.{ ConcurrentEffect, Resource, Sync }
 import cats.implicits._
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
@@ -18,6 +19,11 @@ object SlackAPIClient {
       httpClient <- BlazeClientBuilder[F](SlackApiEC).resource
       client     = SlackAPIClientImpl(httpClient)
     } yield client
+
+  def mock[F[_]: ConcurrentEffect]: F[MockSlackAPIClient[F]] =
+    for {
+      ref <- Ref.of(List[(String, ChatPostMessageRequest)]())
+    } yield MockSlackAPIClient(ref)
 
 }
 
@@ -43,4 +49,13 @@ case class SlackAPIClientImpl[F[_]: Sync](httpClient: Client[F]) extends SlackAP
       _ <- logger.debug(s"SLACK-RESPOND-RES $res")
     } yield ()
 
+}
+
+case class MockSlackAPIClient[F[_]: Sync](
+  private val respondInvocations: Ref[F, List[(String, ChatPostMessageRequest)]]
+) extends SlackAPIClient[F] {
+  override def respond(url: String, input: ChatPostMessageRequest): F[Unit] =
+    respondInvocations.update(f => f :+ ((url, input)))
+
+  def getRespondInvocations: F[List[(String, ChatPostMessageRequest)]] = respondInvocations.get
 }

@@ -35,7 +35,7 @@ lazy val root = project
         "-language:implicitConversions",
         "-language:postfixOps",
         "-Xlint:_,-byname-implicit", // see https://github.com/scala/bug/issues/12072
-        "-Xfatal-warnings"
+//        "-Xfatal-warnings"
       )
     ),
     Test / fork := true,
