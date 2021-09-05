@@ -36,7 +36,7 @@ object SlashCommandBotBuilder {
 
 }
 
-class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private (
+class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private[slashcmd] (
   signingSecret: SigningSecret,
   ec: ExecutionContext = Defaults.ExecutionCtx,
   bindPort: BindPort = Defaults.BindPort,

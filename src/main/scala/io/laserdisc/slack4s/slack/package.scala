@@ -26,6 +26,12 @@ package object slack {
       .text(textElement(text))
       .build()
 
+  def textSection(text: String): LayoutBlock =
+    SectionBlock
+      .builder()
+      .text(textElement(text))
+      .build()
+
   def markdownSection(markdown: String): LayoutBlock =
     SectionBlock
       .builder()

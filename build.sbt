@@ -34,7 +34,7 @@ lazy val root = project
         "-language:higherKinds",
         "-language:implicitConversions",
         "-language:postfixOps",
-        "-Xlint:_,-byname-implicit", // see https://github.com/scala/bug/issues/12072
+        "-Xlint:_,-byname-implicit" // see https://github.com/scala/bug/issues/12072
 //        "-Xfatal-warnings"
       )
     ),
@@ -53,6 +53,6 @@ lazy val root = project
     buildInfoPackage        := "slack4s",
     addCommandAlias("format", ";scalafmtAll;scalafmtSbt"),
     addCommandAlias("checkFormat", ";scalafmtCheckAll;scalafmtSbtCheck"),
-    addCommandAlias("fullTest", ";clean;coverage;test;coverageReport")
+    addCommandAlias("fullTest", ";clean;checkFormat;coverage;test;coverageReport")
   )
   .enablePlugins(BuildInfoPlugin, GitVersioning)

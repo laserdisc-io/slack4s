@@ -6,10 +6,6 @@ import io.laserdisc.slack4s.internal.ProjectRepo
 
 package object canned {
 
-  def warnSlow: ChatPostMessageRequest = slackMessage(
-    markdownSection("This may take a moment, please wait...")
-  )
-
   def somethingWentWrong(payload: SlashCommandPayload): ChatPostMessageRequest =
     slackMessage(
       dividerSection,

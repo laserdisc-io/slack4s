@@ -2,21 +2,40 @@ package io.laserdisc.slack4s.slack
 
 import cats.effect.Sync
 import cats.implicits._
-import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
+import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
 import com.slack.api.app_backend.slash_commands.SlashCommandPayloadParser
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
-import io.circe.Decoder.Result
-import io.circe.{Decoder, Encoder, HCursor}
+import com.slack.api.model.Attachment.VideoHtml
+import com.slack.api.model.block.composition.TextObject
+import com.slack.api.model.block.element.{ BlockElement, RichTextElement }
+import com.slack.api.model.block.{ ContextBlockElement, LayoutBlock }
+import com.slack.api.model.event.MessageChangedEvent.PreviousMessage
+import com.slack.api.util.json._
 import io.circe.parser._
+import io.circe.{ Decoder, Encoder }
+import org.http4s._
 import org.http4s.circe.jsonEncoderOf
-import org.http4s.{DecodeResult, _}
+
+import scala.util.Try
 
 package object internal {
 
+  // TODO: find a way to get circe to work with lombok javabeans without needing gson
   private[this] val gson: Gson = {
     val gsonBuilder = new GsonBuilder
     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+    Map(
+      classOf[BlockElement]        -> new GsonBlockElementFactory,
+      classOf[ContextBlockElement] -> new GsonContextBlockElementFactory,
+      classOf[LayoutBlock]         -> new GsonLayoutBlockFactory,
+      classOf[VideoHtml]           -> new GsonMessageAttachmentVideoHtmlFactory,
+      classOf[PreviousMessage]     -> new GsonMessageChangedEventPreviousMessageFactory,
+      classOf[RichTextElement]     -> new GsonRichTextElementFactory,
+      classOf[TextObject]          -> new GsonTextObjectFactory
+    ).foreach { case (clazz, adapter) => gsonBuilder.registerTypeAdapter(clazz, adapter) }
+
+    gsonBuilder.registerTypeAdapterFactory(new UnknownPropertyDetectionAdapterFactory)
     gsonBuilder.create()
   }
 
@@ -53,8 +72,7 @@ package object internal {
     }
 
   implicit val postMsgReqCirceEncoder: Encoder[ChatPostMessageRequest] =
-    (msg: ChatPostMessageRequest) => {
-      // TODO: find a way to get circe to encode this lombok javabean without gson
+    Encoder.instance { msg =>
       val asStr = gson.toJson(msg)
       parse(asStr) match {
         case Left(pf) => throw pf
@@ -62,8 +80,10 @@ package object internal {
       }
     }
 
-
-
+  implicit val postMsgReqCirceDecoder: Decoder[ChatPostMessageRequest] =
+    Decoder.instanceTry(h =>
+      Try(h.focus.get).map(json => gson.fromJson(json.noSpaces, classOf[ChatPostMessageRequest]))
+    )
 
   implicit def postMsgReqHttp4sEncoder[F[_]: Sync]: EntityEncoder[F, ChatPostMessageRequest] =
     jsonEncoderOf[F, ChatPostMessageRequest]

@@ -1,61 +1,86 @@
 package io.laserdisc.slack4s.slashcmd.internal
 
-import cats.effect.{ ContextShift, IO, Timer }
-import com.slack.api.methods.request.chat.ChatPostMessageRequest
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
+import cats.effect.IO
 import io.laserdisc.slack4s.slack._
-import io.laserdisc.slack4s.slack.internal.SlackAPIClient
 import io.laserdisc.slack4s.slashcmd._
 import munit.FunSuite
-import org.http4s.implicits.http4sLiteralsSyntax
-import org.http4s.{ AuthedRequest, EntityDecoder, Response, Status }
+import org.http4s.circe.CirceEntityCodec._
+import org.http4s.{ Response, Status }
 
-import scala.concurrent.ExecutionContext.global
-import scala.concurrent.duration.DurationInt
+class CommandRunnerTest extends FunSuite with SlashCommandSpec {
 
-class CommandRunnerTest extends FunSuite {
+  test(
+    "when response type == Immediate, runner should deliver HTTP 200 with command handler output"
+  ) {
 
-  val ResponseURL = uri"http://localhost/some-callback-uri"
-
-  def mkResponse(txt: String): ChatPostMessageRequest = slackMessage(headerSection(s"hello $txt"))
-
-  test("should deliver response inline") {
-
-    val (response, callbacks) = runCommandRunner(
-      payload => Command(handler = IO.pure(mkResponse(payload.getText)), respondInline = false),
-      request = mkAuthedSlashCommandRequest(commandText = "foobar", ResponseURL)
+    val (response, callbacks) = runApp(
+      payload =>
+        Command(
+          handler = IO.pure(slackMessage(textSection(s"hello ${payload.getText}"))),
+          responseType = Immediate
+        ),
+      signedSlashCmdRequest(text = "lenny")
     )
 
     assertEquals(response.status, Status.Ok)
+    assertEquals(response.asPostMessageReq, slackMessage(textSection("hello lenny")))
     assertEquals(callbacks, Nil, "did not expect background invocations to the slack API")
 
   }
 
-  def runCommandRunner(
-    commandMapper: CommandMapper[IO],
-    request: AuthedRequest[IO, SlackUser]
-  ): (Response[IO], List[(String, ChatPostMessageRequest)]) = {
+  test(
+    "when response type == Delayed, runner should deliver empty HTTP 200, with the command response in an API client callback"
+  ) {
 
-    implicit val cs: ContextShift[IO] = IO.contextShift(global)
-    implicit val timer: Timer[IO]     = IO.timer(global)
+    val CallbackURL = "http://localhost/some-callback-uri/1111"
 
-    for {
-      // build the runner with a mock slack client so we can verify calls back to slack
-      mockAPIClient <- SlackAPIClient.mock[IO]
-      runner        <- CommandRunner[IO](mockAPIClient, commandMapper)
+    val (response, callbacks) = runApp(
+      payload =>
+        Command(
+          handler = IO.pure(slackMessage(headerSection(s"--- ${payload.getText} ---"))),
+          responseType = Delayed
+        ),
+      signedSlashCmdRequest(text = "foo bar", responseURL = CallbackURL)
+    )
 
-      // the slack call (once authorized) will be routed to processRequest
-      response <- runner.processRequest(request)
+    assertEquals(response.status, Status.Ok)
+    assert(isEmpty(response), "expected an empty response body")
+    assertEquals(
+      callbacks,
+      List(CallbackURL -> slackMessage(headerSection("--- foo bar ---")))
+    )
 
-      // SlashCommandBotBuilder starts `processBGCommandQueue` in parallel to the http service
-      // so we run it briefly to capture any background invocations to the slack API as well
-      _ <- runner.processBGCommandQueue.interruptAfter(1.second).compile.drain
+  }
 
-      // collect the invocations
-      apiCalls <- mockAPIClient.getRespondInvocations
-    } yield (response, apiCalls)
+  test(
+    "when response type == DelayedWithMsg, response should be HTTP 200 with delay msg, and command response in an API client callback"
+  ) {
 
-  }.unsafeRunSync()
+    val CallbackURL = "http://localhost/some-callback-uri/222"
+
+    val DelayMessage = slackMessage(markdownSection("* this will take a while.. *"))
+
+    val (response, callbacks) = runApp(
+      payload =>
+        Command(
+          handler = IO.pure(slackMessage(markdownSection(s"you sent: ${payload.getText}"))),
+          responseType = DelayedWithMsg(DelayMessage)
+        ),
+      signedSlashCmdRequest(text = "woof", responseURL = CallbackURL)
+    )
+
+    assertEquals(response.status, Status.Ok)
+    assertEquals(response.asPostMessageReq, DelayMessage)
+    assertEquals(
+      callbacks,
+      List(CallbackURL -> slackMessage(markdownSection("you sent: woof")))
+    )
+
+  }
+
+  def getBodyText(response: Response[IO]): String = response.as[String].unsafeRunSync()
+
+  def isEmpty(response: Response[IO]): Boolean =
+    response.body.compile.toVector.unsafeRunSync().isEmpty
 
 }
