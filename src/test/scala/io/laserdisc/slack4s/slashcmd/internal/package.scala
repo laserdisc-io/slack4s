@@ -19,7 +19,7 @@ package object internal {
     }
 
     def unsafeAs[T](implicit dec: Decoder[T]): T =
-      resp.as[T].unsafeRunSync()
+      resp.as[T].unsafeRunSync()(cats.effect.unsafe.implicits.global)
 
   }
 

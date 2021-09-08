@@ -1,12 +1,11 @@
 package io.laserdisc.slack4s.slashcmd.internal
 
-import cats.effect.Concurrent
-import cats.syntax.applicativeError._
-import cats.syntax.flatMap._
-import cats.syntax.functor._
+import cats.effect.Async
+import cats.effect.std.Queue
+import cats.implicits._
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
-import fs2.concurrent.Queue
+import fs2.Stream
 import io.circe.syntax._
 import io.laserdisc.slack4s.slack._
 import io.laserdisc.slack4s.slack.canned._
@@ -17,7 +16,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object CommandRunner {
 
-  def apply[F[_]: Concurrent](
+  def apply[F[_]: Async](
     slack: SlackAPIClient[F],
     mapper: CommandMapper[F]
   ): F[CommandRunner[F]] =
@@ -31,7 +30,7 @@ sealed trait CommandRunner[F[_]] {
   def processBGCommandQueue: fs2.Stream[F, Unit]
 }
 
-class CommandRunnerImpl[F[_]: Concurrent](
+class CommandRunnerImpl[F[_]: Async](
   slack: SlackAPIClient[F],
   mapper: CommandMapper[F],
   queue: Queue[F, (SlashCommandPayload, Command[F])]
@@ -65,7 +64,8 @@ class CommandRunnerImpl[F[_]: Concurrent](
   }
 
   override def processBGCommandQueue: fs2.Stream[F, Unit] =
-    queue.dequeue
+    Stream
+      .fromQueueUnterminated(queue)
       .evalMap {
         case (payload, cmd) =>
           cmd.handler.attempt.flatMap {
@@ -88,12 +88,12 @@ class CommandRunnerImpl[F[_]: Concurrent](
 
       case Delayed =>
         queue
-          .enqueue1((payload, cmd))
+          .offer((payload, cmd))
           .as(Response(Status.Ok))
 
       case DelayedWithMsg(msg) =>
         queue
-          .enqueue1((payload, cmd))
+          .offer((payload, cmd))
           .as(Response(Status.Ok).withEntity(msg))
 
     }
