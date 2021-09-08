@@ -23,15 +23,15 @@ object CommandRunner {
   ): F[CommandRunner[F]] =
     Queue
       .unbounded[F, (SlashCommandPayload, Command[F])]
-      .map(new CommandHandlerImpl[F](slack, mapper, _))
+      .map(new CommandRunnerImpl[F](slack, mapper, _))
 }
 
 sealed trait CommandRunner[F[_]] {
-  def acceptCommand(ar: AuthedRequest[F, SlackUser]): F[Response[F]]
-  def backgroundRunner: fs2.Stream[F, Unit]
+  def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]]
+  def processBGCommandQueue: fs2.Stream[F, Unit]
 }
 
-class CommandHandlerImpl[F[_]: Concurrent](
+class CommandRunnerImpl[F[_]: Concurrent](
   slack: SlackAPIClient[F],
   mapper: CommandMapper[F],
   queue: Queue[F, (SlashCommandPayload, Command[F])]
@@ -49,7 +49,7 @@ class CommandHandlerImpl[F[_]: Concurrent](
       .respond(payload.getResponseUrl, response)
       .handleErrorWith { err =>
         logger.error(err)(
-          s"SLACK-RESPOND-FAIL command:${command.logToken} payload:'${payload.getText}' error:$err triedToSend:${response.asJson.noSpaces}"
+          s"SLACK-RESPOND-FAIL command:${command.logId} payload:'${payload.getText}' error:$err triedToSend:${response.asJson.noSpaces}"
         ) >>
           respondSomethingWentWrong(payload)
       }
@@ -64,38 +64,49 @@ class CommandHandlerImpl[F[_]: Concurrent](
     }
   }
 
-  override def backgroundRunner: fs2.Stream[F, Unit] =
+  override def processBGCommandQueue: fs2.Stream[F, Unit] =
     queue.dequeue
       .evalMap {
         case (payload, cmd) =>
           cmd.handler.attempt.flatMap {
             case Left(e) =>
               logger.error(e)(
-                s"CMD-BG-FAIL cmd:${cmd.logToken} reqId=${payload.requestId} e:${e.getMessage}"
+                s"CMD-BG-FAIL cmdId:${cmd.logId} reqId=${payload.requestId} e:${e.getMessage}"
               ) >> respondSomethingWentWrong(payload)
 
             case Right(res) =>
               logger.info(
-                s"CMD-BG-SUCCESS cmd:${cmd.logToken} reqId=${payload.requestId} message:${res.getBlocks}"
+                s"CMD-BG-SUCCESS cmdId:${cmd.logId} reqId=${payload.requestId} message:${res.getBlocks}"
               ) >> respond(payload, cmd, res)
           }
       }
 
-  def executeNow(cmd: Command[F]): F[Response[F]] =
-    cmd.handler.map(Response(Status.Ok).withEntity(_))
+  def execute(payload: SlashCommandPayload, cmd: Command[F]): F[Response[F]] =
+    cmd.responseType match {
+      case Immediate =>
+        cmd.handler.map(Response(Status.Ok).withEntity(_))
 
-  def executeLater(payload: SlashCommandPayload, cmd: Command[F]): F[Response[F]] =
-    queue.enqueue1((payload, cmd)).as(Response(Status.Ok).withEntity(warnSlow))
+      case Delayed =>
+        queue
+          .enqueue1((payload, cmd))
+          .as(Response(Status.Ok))
 
-  override def acceptCommand(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
+      case DelayedWithMsg(msg) =>
+        queue
+          .enqueue1((payload, cmd))
+          .as(Response(Status.Ok).withEntity(msg))
+
+    }
+
+  override def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
     ar.req.decode[SlashCommandPayload] { payload =>
       for {
-        _   <- logger.info(s"PARSE-CMD reqId=${payload.requestId}  payload:'$payload'")
+        _   <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
         cmd = mapper(payload)
         _ <- logger.info(
-              s"COMMAND-SELECT cmd:${cmd.logToken} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' respondImmediately:${cmd.respondImmediately}"
+              s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
             )
-        res <- if (cmd.respondImmediately) executeNow(cmd) else executeLater(payload, cmd)
+        res <- execute(payload, cmd)
       } yield res
     }
 

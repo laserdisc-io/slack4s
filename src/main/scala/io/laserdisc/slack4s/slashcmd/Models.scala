@@ -5,8 +5,8 @@ import com.slack.api.methods.request.chat.ChatPostMessageRequest
 
 case class Command[F[_]](
   handler: F[ChatPostMessageRequest],
-  respondImmediately: Boolean = false,
-  logToken: LogToken = "NA"
+  responseType: ResponseType,
+  logId: LogToken = "NA"
 )
 
 sealed trait AuthError                                                      extends Throwable
@@ -14,3 +14,8 @@ case class MissingHeader(headerName: String)                                exte
 case class BadSignature(timestamp: String, body: String, signature: String) extends AuthError
 
 case class SlackUser(teamId: String, userId: String)
+
+sealed trait ResponseType
+case object Immediate                                  extends ResponseType
+case object Delayed                                    extends ResponseType
+case class DelayedWithMsg(msg: ChatPostMessageRequest) extends ResponseType

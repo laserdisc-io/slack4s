@@ -30,7 +30,7 @@ object ExampleSlashCommandApp extends IOApp {
       case "" =>
         Command(
           handler = IO.pure(slackMessage(headerSection("Please provide a search term!"))),
-          respondImmediately = true
+          responseType = Immediate
         )
       case searchTerm =>
         Command(
@@ -44,7 +44,8 @@ object ExampleSlashCommandApp extends IOApp {
                 headerSection(s"Space news results for: $searchTerm")
                   +: articles.flatMap(formatNewsArticle)
               )
-          }
+          },
+          responseType = Delayed
         )
     }
   }

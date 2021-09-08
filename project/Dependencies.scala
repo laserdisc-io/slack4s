@@ -1,13 +1,14 @@
-import sbt.Keys.libraryDependencies
+import sbt.Keys.{ libraryDependencies, testFrameworks }
 import sbt._
 
 object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest"   % "3.2.9"  % Test,
+      "org.scalameta" %% "munit"       % "0.7.28" % Test,
       "org.mockito"   % "mockito-core" % "3.12.4" % Test
-    )
+    ),
+    testFrameworks += new TestFramework("munit.Framework")
   )
 
   val Slack = Seq(

@@ -7,32 +7,6 @@ on:
     branches:
       - main
 jobs:
-  format:
-    name: Format
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Branch Checkout
-        uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-      - name: Install Java And Sbt
-        uses: olafurpg/setup-scala@v10
-        with:
-          java-version: adopt@1.11
-      - name: Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            $HOME/.cache/coursier
-            $HOME/.ivy2/cache
-            $HOME/.sbt/boot/
-            $HOME/.sbt
-            lib_managed
-            target
-            project/target
-          key: ${{ runner.os }}-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
-      - name: Check with Scalafmt
-        run: sbt ++2.13.6 checkFormat
   build:
     name: Test
     needs: format
