@@ -1,7 +1,6 @@
 package io.laserdisc.slack4s.slack.internal
 
-import cats.effect.concurrent.Ref
-import cats.effect.{ ConcurrentEffect, Resource, Sync }
+import cats.effect.{ Async, Ref, Resource }
 import cats.implicits._
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import io.laserdisc.slack4s.internal.mkCachedThreadPool
@@ -14,13 +13,13 @@ object SlackAPIClient {
 
   private[this] val SlackApiEC = mkCachedThreadPool(prefix = "slack-api-client")
 
-  def resource[F[_]: ConcurrentEffect]: Resource[F, SlackAPIClientImpl[F]] =
+  def resource[F[_]: Async]: Resource[F, SlackAPIClientImpl[F]] =
     for {
       httpClient <- BlazeClientBuilder[F](SlackApiEC).resource
       client     = SlackAPIClientImpl(httpClient)
     } yield client
 
-  def mock[F[_]: ConcurrentEffect]: F[MockSlackAPIClient[F]] =
+  def mock[F[_]: Async]: F[MockSlackAPIClient[F]] =
     for {
       ref <- Ref.of(List[(String, ChatPostMessageRequest)]())
     } yield MockSlackAPIClient(ref)
@@ -33,7 +32,7 @@ trait SlackAPIClient[F[_]] {
 
 case class SlackResponseAccepted()
 
-case class SlackAPIClientImpl[F[_]: Sync](httpClient: Client[F]) extends SlackAPIClient[F] {
+case class SlackAPIClientImpl[F[_]: Async](httpClient: Client[F]) extends SlackAPIClient[F] {
 
   private[this] val logger = Slf4jLogger.getLogger[F]
 
@@ -51,7 +50,7 @@ case class SlackAPIClientImpl[F[_]: Sync](httpClient: Client[F]) extends SlackAP
 
 }
 
-case class MockSlackAPIClient[F[_]: Sync](
+case class MockSlackAPIClient[F[_]: Async](
   private val respondInvocations: Ref[F, List[(String, ChatPostMessageRequest)]]
 ) extends SlackAPIClient[F] {
   override def respond(url: String, input: ChatPostMessageRequest): F[Unit] =

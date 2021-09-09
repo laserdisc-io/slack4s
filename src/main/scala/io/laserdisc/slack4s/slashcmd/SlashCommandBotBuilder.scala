@@ -1,6 +1,6 @@
 package io.laserdisc.slack4s.slashcmd
 
-import cats.effect.{ ConcurrentEffect, _ }
+import cats.effect._
 import cats.implicits._
 import eu.timepit.refined.auto._
 import io.laserdisc.slack4s.internal._
@@ -28,15 +28,11 @@ object SlashCommandBotBuilder {
 
   }
 
-  def apply[F[_]](signingSecret: SigningSecret)(
-    implicit f: ConcurrentEffect[F],
-    t: Timer[F]
-  ): SlashCommandBotBuilder[F] =
+  def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
     new SlashCommandBotBuilder[F](signingSecret = signingSecret)
-
 }
 
-class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private[slashcmd] (
+class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   signingSecret: SigningSecret,
   ec: ExecutionContext = Defaults.ExecutionCtx,
   bindPort: BindPort = Defaults.BindPort,
@@ -77,7 +73,7 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private[slashcmd] (
   def withCommandMapper(commandParser: CommandMapper[F]): Self =
     copy(commandParser = Some(commandParser))
 
-  final def serve: fs2.Stream[F, ExitCode] =
+  final def serve: fs2.Stream[F, Unit] =
     fs2.Stream
       .resource(SlackAPIClient.resource[F])
       .evalMap(slackApiClient =>
@@ -94,10 +90,9 @@ class SlashCommandBotBuilder[F[_]: ConcurrentEffect: Timer] private[slashcmd] (
                 .withServiceErrorHandler(errorHandler)
             ).serve
           )
-          .as(ExitCode.Success)
       }
 
-  def serveF: F[ExitCode] = serve.compile.lastOrError
+  def serveF: F[Unit] = serve.compile.lastOrError
 
   final val Banner = {
     val msg = s"Starting slack4s v${BuildInfo.version}"

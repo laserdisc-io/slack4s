@@ -1,6 +1,6 @@
 package io.laserdisc.slack4s.slack
 
-import cats.effect.Sync
+import cats.effect.{ Async, Sync }
 import cats.implicits._
 import com.google.gson.{ FieldNamingPolicy, Gson, GsonBuilder }
 import com.slack.api.app_backend.slash_commands.SlashCommandPayloadParser
@@ -40,14 +40,14 @@ package object internal {
   }
 
   // slack responds with a body of just "ok" on success
-  implicit def responseAcceptedDecoder[F[_]: Sync]: EntityDecoder[F, SlackResponseAccepted] =
+  implicit def responseAcceptedDecoder[F[_]: Async]: EntityDecoder[F, SlackResponseAccepted] =
     EntityDecoder.text.map {
       case "ok" => SlackResponseAccepted()
       case unexpected =>
         throw new IllegalArgumentException(s"Expected 'ok' in body, got $unexpected")
     }
 
-  implicit def commandPayloadDecoder[F[_]: Sync]: EntityDecoder[F, SlashCommandPayload] =
+  implicit def commandPayloadDecoder[F[_]: Async]: EntityDecoder[F, SlashCommandPayload] =
     new EntityDecoder[F, SlashCommandPayload] {
 
       private[this] val mediaType = MediaType.application.`x-www-form-urlencoded`

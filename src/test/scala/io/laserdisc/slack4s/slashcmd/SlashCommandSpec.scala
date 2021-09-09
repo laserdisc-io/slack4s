@@ -1,6 +1,7 @@
 package io.laserdisc.slack4s.slashcmd
 
-import cats.effect.{ ContextShift, IO, Timer }
+import cats.effect.IO
+import cats.effect.unsafe.IORuntime
 import com.slack.api.app_backend.SlackSignature
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import eu.timepit.refined.auto._
@@ -12,7 +13,6 @@ import org.http4s.client.dsl.io._
 import org.http4s.implicits.http4sLiteralsSyntax
 import org.typelevel.ci.CIString
 
-import scala.concurrent.ExecutionContext.global
 import scala.concurrent.duration.DurationInt
 
 trait SlashCommandSpec {
@@ -21,6 +21,8 @@ trait SlashCommandSpec {
   val DefaultResponseUrl: String              = "http://localhost:1234/not/a/real/callback"
   val DefaultTeamID: String                   = "testSlackTeamID"
   val DefaultUserID: String                   = "testSlackUserID"
+
+  implicit lazy val runtime: IORuntime = cats.effect.unsafe.implicits.global
 
   def signedSlashCmdRequest(
     text: String,
@@ -58,9 +60,6 @@ trait SlashCommandSpec {
     commandMapper: CommandMapper[IO],
     request: Request[IO]
   ): (Response[IO], List[(String, ChatPostMessageRequest)]) = {
-
-    implicit val cs: ContextShift[IO] = IO.contextShift(global)
-    implicit val timer: Timer[IO]     = IO.timer(global)
 
     for {
       // build the runner with a mock slack client so we can verify calls back to slack

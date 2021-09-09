@@ -1,13 +1,13 @@
 package io.laserdisc.slack4s.slashcmd.internal
 import cats.data.{ Kleisli, OptionT }
-import cats.effect.Sync
+import cats.effect.{ Async, Sync }
 import cats.implicits._
 import com.slack.api.app_backend.SlackSignature
 import com.slack.api.app_backend.SlackSignature.HeaderNames._
 import com.slack.api.app_backend.SlackSignature.Verifier
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
-import io.laserdisc.slack4s.slashcmd._
 import io.laserdisc.slack4s.slack.internal._
+import io.laserdisc.slack4s.slashcmd._
 import org.http4s._
 import org.http4s.server.AuthMiddleware
 import org.typelevel.ci.CIString
@@ -20,7 +20,7 @@ object SignatureValidator {
   private[this] def forbidden[F[_]: Sync]: AuthedRoutes[String, F] =
     Kleisli(_ => OptionT.pure(Response[F](Status.Unauthorized)))
 
-  def withValidSignature[F[_]: Sync](
+  def withValidSignature[F[_]: Async](
     signingSecret: String
   ): AuthMiddleware[F, SlackUser] = {
 
