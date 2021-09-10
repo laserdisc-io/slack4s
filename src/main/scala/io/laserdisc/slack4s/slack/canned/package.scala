@@ -6,6 +6,7 @@ import io.laserdisc.slack4s.internal.ProjectRepo
 
 package object canned {
 
+  // $COVERAGE-OFF$
   def somethingWentWrong(payload: SlashCommandPayload): ChatPostMessageRequest =
     slackMessage(
       dividerSection,
@@ -27,4 +28,5 @@ package object canned {
            |Visit the <$ProjectRepo|the slack4s homepage> for more information on how to write a custom handler.""".stripMargin
       )
     )
+  // $COVERAGE-ON$
 }

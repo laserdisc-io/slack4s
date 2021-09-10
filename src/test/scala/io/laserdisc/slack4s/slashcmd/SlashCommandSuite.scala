@@ -7,15 +7,16 @@ import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import eu.timepit.refined.auto._
 import io.laserdisc.slack4s.slack.internal.SlackAPIClient
 import io.laserdisc.slack4s.slashcmd.internal.CommandRunner
+import munit.FunSuite
 import org.http4s.Method.POST
 import org.http4s._
 import org.http4s.client.dsl.io._
 import org.http4s.implicits.http4sLiteralsSyntax
 import org.typelevel.ci.CIString
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 
-trait SlashCommandSpec {
+trait SlashCommandSuite extends FunSuite {
 
   val DefaultTestSigningSecret: SigningSecret = "aabbbcccdddeeefff111222333444555666"
   val DefaultResponseUrl: String              = "http://localhost:1234/not/a/real/callback"
@@ -56,9 +57,10 @@ trait SlashCommandSpec {
 
   }
 
-  def runApp(
+  def testSlashCmdService(
     commandMapper: CommandMapper[IO],
-    request: Request[IO]
+    request: Request[IO],
+    waitForCallbacks: Option[(Int, FiniteDuration)] = None
   ): (Response[IO], List[(String, ChatPostMessageRequest)]) = {
 
     for {
@@ -73,7 +75,10 @@ trait SlashCommandSpec {
 
       // The app starts `runner.processBGCommandQueue` in parallel to the http service,
       // so we run it briefly to capture any background invocations to the slack API as well
-      _ <- runner.processBGCommandQueue.take(1).interruptAfter(1.seconds).compile.drain
+      _ <- waitForCallbacks.fold(IO.unit) {
+            case (takeN, duration) =>
+              runner.processBGCommandQueue.take(takeN).interruptAfter(duration).compile.drain
+          }
 
       // collect the invocations
       apiCalls <- mockAPIClient.getRespondInvocations

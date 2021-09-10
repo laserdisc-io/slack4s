@@ -11,7 +11,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object SlackAPIClient {
 
-  private[this] val SlackApiEC = mkCachedThreadPool(prefix = "slack-api-client")
+  private[this] val SlackApiEC = mkCachedThreadPool(prefix = "slack-api")
 
   def resource[F[_]: Async]: Resource[F, SlackAPIClientImpl[F]] =
     for {

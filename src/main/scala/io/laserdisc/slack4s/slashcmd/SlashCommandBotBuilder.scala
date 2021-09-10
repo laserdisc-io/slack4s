@@ -11,7 +11,6 @@ import io.laserdisc.slack4s.slashcmd.internal._
 import org.http4s._
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.dsl.Http4sDsl
-import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.{ Router, ServiceErrorHandler }
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -22,10 +21,9 @@ import scala.concurrent.ExecutionContext
 object SlashCommandBotBuilder {
 
   object Defaults {
-    val ExecutionCtx: ExecutionContext = mkCachedThreadPool("CmdHandler")
+    val ExecutionCtx: ExecutionContext = mkCachedThreadPool("cmd-bot-svc")
     val BindPort: BindPort             = 8080
     val BindAddress: BindAddress       = "0.0.0.0"
-
   }
 
   def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
@@ -124,7 +122,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     Router(
       RouteNames.HEALTHCHECK -> HttpRoutes.of[F] {
         case GET -> Root =>
-          Ok(s"All OK")
+          Ok.apply(s"OK")
       },
       RouteNames.SLACK -> withValidSignature(signingSecret).apply(
         AuthedRoutes.of[SlackUser, F] {

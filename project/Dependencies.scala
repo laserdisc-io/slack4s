@@ -5,8 +5,9 @@ object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"       % "0.7.29" % Test,
-      "org.mockito"   % "mockito-core" % "3.12.4" % Test
+      "org.scalameta" %% "munit"          % "0.7.29" % Test,
+      "org.mockito"   % "mockito-core"    % "3.12.4" % Test,
+      "org.gnieh"     %% f"diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -22,8 +23,8 @@ object Dependencies {
   val Logging = Seq(
     libraryDependencies ++= Seq(
       "org.typelevel"  %% "log4cats-slf4j" % "2.1.1",
-      "ch.qos.logback" % "logback-classic" % "1.2.5" % Test,
-      "ch.qos.logback" % "logback-core"    % "1.2.5" % Test,
+      "ch.qos.logback" % "logback-classic" % "1.2.6" % Test,
+      "ch.qos.logback" % "logback-core"    % "1.2.6" % Test,
       "org.slf4j"      % "jcl-over-slf4j"  % "1.7.32" % Test,
       "org.slf4j"      % "jul-to-slf4j"    % "1.7.32" % Test
     )
@@ -45,7 +46,8 @@ object Dependencies {
       "io.circe" %% "circe-core"           % CirceVersion,
       "io.circe" %% "circe-generic"        % CirceVersion,
       "io.circe" %% "circe-generic-extras" % CirceVersion,
-      "io.circe" %% "circe-parser"         % CirceVersion
+      "io.circe" %% "circe-parser"         % CirceVersion,
+      "io.circe" %% "circe-optics"         % CirceVersion
     )
   )
 
