@@ -42,8 +42,6 @@ object SignatureValidator {
         sig      <- getRequiredHeader(request, X_SLACK_SIGNATURE)
         bodyText <- request.as[String]
         payload  <- request.as[SlashCommandPayload]
-        _        <- logger.warn(s"BODYTEXT=$bodyText")
-        _        <- logger.warn(s"PAYLOAD =$payload")
         res = Either.cond(
           slackSignatureVerifier.isValid(ts, bodyText, sig),
           SlackUser(payload.getTeamId, payload.getUserId),

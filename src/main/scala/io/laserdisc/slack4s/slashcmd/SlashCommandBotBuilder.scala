@@ -11,7 +11,6 @@ import io.laserdisc.slack4s.slashcmd.internal._
 import org.http4s._
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.dsl.Http4sDsl
-import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.{ Router, ServiceErrorHandler }
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -124,7 +123,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     Router(
       RouteNames.HEALTHCHECK -> HttpRoutes.of[F] {
         case GET -> Root =>
-          Ok(s"All OK")
+          Ok.apply(s"OK")
       },
       RouteNames.SLACK -> withValidSignature(signingSecret).apply(
         AuthedRoutes.of[SlackUser, F] {
