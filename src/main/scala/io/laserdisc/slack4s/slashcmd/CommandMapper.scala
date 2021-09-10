@@ -10,6 +10,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger.getLogger
 
 object CommandMapper {
 
+  // $COVERAGE-OFF$
   def default[F[_]: Sync]: CommandMapper[F] =
     (payload: SlashCommandPayload) =>
       Command(
@@ -21,5 +22,6 @@ object CommandMapper {
         responseType = Immediate,
         logId = "GETTING-STARTED"
       )
+  // $COVERAGE-ON$
 
 }

@@ -21,10 +21,9 @@ import scala.concurrent.ExecutionContext
 object SlashCommandBotBuilder {
 
   object Defaults {
-    val ExecutionCtx: ExecutionContext = mkCachedThreadPool("CmdHandler")
+    val ExecutionCtx: ExecutionContext = mkCachedThreadPool("cmd-bot-svc")
     val BindPort: BindPort             = 8080
     val BindAddress: BindAddress       = "0.0.0.0"
-
   }
 
   def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =

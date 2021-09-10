@@ -5,8 +5,9 @@ object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"       % "0.7.29" % Test,
-      "org.mockito"   % "mockito-core" % "3.12.4" % Test
+      "org.scalameta" %% "munit"          % "0.7.29" % Test,
+      "org.mockito"   % "mockito-core"    % "3.12.4" % Test,
+      "org.gnieh"     %% f"diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
