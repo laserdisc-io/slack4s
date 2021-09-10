@@ -11,7 +11,7 @@ import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 class CommandRunnerTest extends SlashCommandSuite {
 
   // when testing the bg running in these scenarios, take 1 element if produced, else timeout after a second
-  val waitForCallbacks: Option[(Int, FiniteDuration)] = Some(1, 1.second)
+  val waitForCallbacks: Option[(Int, FiniteDuration)] = Some((1, 1.second))
 
   test(
     "when response type == Immediate, runner should deliver HTTP 200 with command handler output"

@@ -21,7 +21,9 @@ import scala.util.Try
 
 package object internal {
 
-  // TODO: find a way to get circe to work with lombok javabeans without needing gson
+  /* The message classes that the slack SDK provides are intended for use with lombok & Gson. Rather
+   * than build an entire family of circe codecs by hand, we delegate to Gson and use the gson factory
+   * classes that are available in the slack SDK library. */
   private[this] val gson: Gson = {
     val gsonBuilder = new GsonBuilder
     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
