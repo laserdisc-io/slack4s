@@ -49,7 +49,7 @@ jobs:
       - name: Covert Coverage Results
         run: |
           pip install coveragepy-lcov
-          coveragepy-lcov --data_file_path .coverage --output_file_path lcov.info
+          coveragepy-lcov --data_file_path target/scala-2.13/scoverage-data/scoverage.coverage --output_file_path lcov.info
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@master
         with:
