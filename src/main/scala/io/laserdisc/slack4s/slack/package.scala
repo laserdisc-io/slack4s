@@ -117,7 +117,7 @@ package object slack {
     def requestId: String =
       Option(p.getTriggerId)
         .map(_.trim.takeRight(8))
-        .filter(!_.isBlank)
+        .filter(!_.isEmpty)
         .getOrElse("n/a")
 
   }

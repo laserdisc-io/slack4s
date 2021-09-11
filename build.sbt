@@ -48,7 +48,6 @@ lazy val root = project
     Dependencies.Http4s,
     Dependencies.Slack,
     // ------------------ version fmt + buildinfo ------------------
-    git.formattedShaVersion := git.gitHeadCommit.value.map(_.take(8)),
     buildInfoKeys           := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage        := "slack4s",
     addCommandAlias("format", ";scalafmtAll;scalafmtSbt"),
