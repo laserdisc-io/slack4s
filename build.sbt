@@ -1,3 +1,5 @@
+ThisBuild / scalaVersion := "2.13.6"
+
 lazy val publishSettings = Seq(
   Test / publishArtifact := false,
   pomIncludeRepository   := (_ => false),
@@ -22,8 +24,8 @@ lazy val root = project
   .in(file("."))
   .settings(
     name := "slack4s",
+    publishSettings,
     Seq(
-      scalaVersion := "2.13.6",
       addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
       scalacOptions ++= Seq(
         "-encoding",
@@ -34,8 +36,8 @@ lazy val root = project
         "-language:higherKinds",
         "-language:implicitConversions",
         "-language:postfixOps",
-        "-Xlint:_,-byname-implicit" // see https://github.com/scala/bug/issues/12072
-//        "-Xfatal-warnings"
+        "-Xlint:_,-byname-implicit", // see https://github.com/scala/bug/issues/12072
+        "-Xfatal-warnings"
       )
     ),
     Test / fork := true,
@@ -48,8 +50,8 @@ lazy val root = project
     Dependencies.Http4s,
     Dependencies.Slack,
     // ------------------ version fmt + buildinfo ------------------
-    buildInfoKeys           := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage        := "slack4s",
+    buildInfoKeys    := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "slack4s",
     addCommandAlias("format", ";scalafmtAll;scalafmtSbt"),
     addCommandAlias("checkFormat", ";scalafmtCheckAll;scalafmtSbtCheck"),
     addCommandAlias("fullTest", ";clean;checkFormat;coverage;test;coverageReport")
