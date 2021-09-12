@@ -4,7 +4,14 @@
 
 A pure functional library for easily building slack bots, built on [cats 3.x](https://typelevel.org/cats/), [http4s](https://http4s.org/) and the [Slack Java SDK](https://github.com/slackapi/java-slack-sdk/).  
 
-Right now, [slash commands](https://api.slack.com/interactivity/slash-commands) are supported (contributions welcome!).   This library takes away all of the hassle of needing to know how to interact with Slack's API, encoding/decoding payloads and verifiying signature validity.   Simply provide your business logic and you're done!
+Right now, [slash commands](https://api.slack.com/interactivity/slash-commands) are supported (contributions welcome!).   This library takes care of 
+
+* Interacting with Slack's API
+* Encoding/decoding payloads
+* Verifying signature validity
+* Handling background callbacks for longer running commands
+
+Simply provide your business logic and you've got a deployable app!
 
 ## Slash Command Handler Quickstart
 
