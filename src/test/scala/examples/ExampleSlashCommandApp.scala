@@ -1,6 +1,6 @@
 package examples
 
-import cats.effect.{ IO, IOApp }
+import cats.effect.{IO, IOApp}
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.model.block.LayoutBlock
 import eu.timepit.refined.auto._
@@ -23,7 +23,7 @@ object ExampleSlashCommandApp extends IOApp.Simple {
   override def run: IO[Unit] =
     SlashCommandBotBuilder[IO](secret)
       .withCommandMapper(testCommandMapper)
-      .serveF
+      .serve
 
   def testCommandMapper: CommandMapper[IO] = { (payload: SlashCommandPayload) =>
     payload.getText.trim match {

@@ -71,7 +71,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   def withCommandMapper(commandParser: CommandMapper[F]): Self =
     copy(commandParser = Some(commandParser))
 
-  final def serve: fs2.Stream[F, Unit] =
+  final def serveStream: fs2.Stream[F, Unit] =
     fs2.Stream
       .resource(SlackAPIClient.resource[F])
       .evalMap(slackApiClient =>
@@ -90,7 +90,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
           )
       }
 
-  def serveF: F[Unit] = serve.compile.lastOrError
+  def serve: F[Unit] = serveStream.compile.drain
 
   final val Banner = {
     val msg = s"Starting slack4s v${BuildInfo.version}"
