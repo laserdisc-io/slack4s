@@ -1,6 +1,6 @@
 package examples
 
-import cats.effect.{IO, IOApp}
+import cats.effect.{ IO, IOApp }
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.model.block.LayoutBlock
 import eu.timepit.refined.auto._
