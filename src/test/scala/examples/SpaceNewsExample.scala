@@ -1,6 +1,6 @@
 package examples
 
-import cats.effect.{ IO, IOApp }
+import cats.effect.{IO, IOApp}
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.model.block.LayoutBlock
 import eu.timepit.refined.auto._
@@ -16,16 +16,16 @@ import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import java.time.Instant
 import scala.concurrent.ExecutionContext.global
 
-object ExampleSlashCommandApp extends IOApp.Simple {
+object SpaceNewsExample extends IOApp.Simple {
 
-  val secret: SigningSecret = "in the real world you wouldn't hardcode secrets...right?"
+  val secret: SigningSecret = "7e162b0fd1bf1ca4537afa4246368c2c"
 
   override def run: IO[Unit] =
     SlashCommandBotBuilder[IO](secret)
-      .withCommandMapper(testCommandMapper)
+      .withCommandMapper(mapper)
       .serve
 
-  def testCommandMapper: CommandMapper[IO] = { (payload: SlashCommandPayload) =>
+  def mapper: CommandMapper[IO] = { (payload: SlashCommandPayload) =>
     payload.getText.trim match {
       case "" =>
         Command(

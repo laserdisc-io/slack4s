@@ -12,12 +12,12 @@
         <appender-ref ref="STDOUT" />
     </appender>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="ASYNCSTDOUT" />
     </root>
 
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
-    <logger name="io.laserdisc" level="WARN" />
+    <logger name="io.laserdisc" level="INFO" />
 
 </configuration>

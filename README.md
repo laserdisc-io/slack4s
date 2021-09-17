@@ -1,6 +1,8 @@
 # slack4s
 
-![CI](https://github.com/laserdisc-io/slack4s/actions/workflows/ci.yaml/badge.svg) [![codecov](https://codecov.io/gh/laserdisc-io/slack4s/branch/main/graph/badge.svg?token=BEDHQ818EI)](https://codecov.io/gh/laserdisc-io/slack4s)
+![CI](https://github.com/laserdisc-io/slack4s/actions/workflows/ci.yaml/badge.svg) 
+[![codecov](https://codecov.io/gh/laserdisc-io/slack4s/branch/main/graph/badge.svg?token=BEDHQ818EI)](https://codecov.io/gh/laserdisc-io/slack4s)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/laserdisc-io/slack4s)
 
 A pure functional library for easily building slack bots, built on [cats 3.x](https://typelevel.org/cats/), [http4s](https://http4s.org/) and the [Slack Java SDK](https://github.com/slackapi/java-slack-sdk/).  
 
@@ -32,7 +34,7 @@ import io.laserdisc.slack4s.slashcmd._
 
 object MySlackBot extends IOApp.Simple {
 
-  val secret: SigningSecret = "your secret that normally should not be hardcoded, right?"  
+  val secret: SigningSecret = "your-signing-secret" // demo purposes - please don't hardcode secrets  
   
   override def run: IO[Unit] = SlashCommandBotBuilder[IO](secret).serve
 
@@ -40,11 +42,16 @@ object MySlackBot extends IOApp.Simple {
 
 ```
 
-* Set your slash command's "_Request URL_" to `https://{YOUR-HOST}/slack/slashCmd` (copy that path exactly)
-* If your hosting (e.g. k8s, AWS ECS) needs a health check endpoint, use `https://{YOUR-HOST}/healthCheck`  
-* Issue your slash command, e.g. `/mycommand woof` and you should get the default response:
+Set your slash command's **Request URL** to 
 
-TODO: screenshot of default impl
+```
+https://{your-base-url}/slack/slashCmd
+```
+
+
+Issue your slash command, e.g. `/slack4s foo` and you should get the default response:
+
+![default response screenshot with placeholder message](https://user-images.githubusercontent.com/885049/133712091-82037415-8f72-4fcf-b1ae-4942c4f47f95.png)
 
 The builder has some more useful functions if you need to customize your deployment further:
 
@@ -59,6 +66,12 @@ SlashCommandBotBuilder[IO](secret)
      .withMaxConnections(512)
   }
   .serve
+```
+
+If your hosting (e.g. k8s, AWS ECS) needs a health check endpoint, use: 
+
+```
+https://{your-base-url}/healthCheck
 ```
 
 ## Implementing Your Mapper Logic
@@ -110,12 +123,8 @@ This is the description of how - _and when_ - to handle the user's request. The 
   * `"NA"` by default, this token used in slack4s's logs when processing this particular command (useful for log filtering)
 
 
-## An Example!
+## Example
+* See [src/](src/test/scala/examples/SpaceNewsExample.scala) for a working example of a slash command handler.
 
-Check out [ExampleSlashCommandApp](src/test/scala/examples/ExampleSlashCommandApp.scala) for a working example of a slash command app, that returns an immediate response if no parameter is provided, else queries an external API for some space news for the provided search term, and returns a formatted list of articles.
-
-Not only does it show how to perform effectful IO in response to a command, it shows the many convenience functions available in `io.laserdisc.slack4s.slack._` that can be used to build a Slack API [ChatPostMessageRequest](https://github.com/slackapi/java-slack-sdk/blob/main/slack-api-client/src/main/java/com/slack/api/methods/request/chat/ChatPostMessageRequest.java) in response. 
-
-[TODO: screenshots]
-
-
+## Tutorial
+* See [docs/tutorial.md](docs/tutorial.md) for a walkthrough of configuring and running the example. 
