@@ -1,6 +1,6 @@
 # slack4s
 
-![example workflow](https://github.com/laserdisc-io/slack4s/actions/workflows/ci.yaml/badge.svg)
+![CI](https://github.com/laserdisc-io/slack4s/actions/workflows/ci.yaml/badge.svg) [![codecov](https://codecov.io/gh/laserdisc-io/slack4s/branch/main/graph/badge.svg?token=BEDHQ818EI)](https://codecov.io/gh/laserdisc-io/slack4s)
 
 A pure functional library for easily building slack bots, built on [cats 3.x](https://typelevel.org/cats/), [http4s](https://http4s.org/) and the [Slack Java SDK](https://github.com/slackapi/java-slack-sdk/).  
 
