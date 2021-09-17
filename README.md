@@ -124,7 +124,7 @@ This is the description of how - _and when_ - to handle the user's request. The 
 
 
 ## Example
-* See [src/](src/test/scala/examples/SpaceNewsExample.scala) for a working example of a slash command handler.
+* See [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala) for a working example of a slash command handler.
 
 ## Tutorial
-* See [docs/tutorial.md](docs/tutorial.md) for a walkthrough of configuring and running the example. 
+* See [docs/tutorial.md](docs/tutorial.md) for a walk-through of configuring and running [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala). 
