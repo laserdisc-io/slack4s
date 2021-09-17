@@ -15,7 +15,13 @@ Right now, [slash commands](https://api.slack.com/interactivity/slash-commands) 
 
 Simply provide your business logic and you've got a deployable app!
 
-## Slash Command Handler Quickstart
+## Example
+* See [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala) for a working example of a slash command handler.
+
+## Tutorial
+* See [docs/tutorial.md](docs/tutorial.md) for a walk-through of configuring and running [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala). 
+
+## Quickstart
 
 Add the following dependency:
 
@@ -122,9 +128,3 @@ This is the description of how - _and when_ - to handle the user's request. The 
 * **logId**: `LogToken` 
   * `"NA"` by default, this token used in slack4s's logs when processing this particular command (useful for log filtering)
 
-
-## Example
-* See [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala) for a working example of a slash command handler.
-
-## Tutorial
-* See [docs/tutorial.md](docs/tutorial.md) for a walk-through of configuring and running [SpaceNewsExample](src/test/scala/examples/SpaceNewsExample.scala). 
