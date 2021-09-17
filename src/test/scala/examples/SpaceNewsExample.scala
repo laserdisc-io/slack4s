@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.global
 
 object SpaceNewsExample extends IOApp.Simple {
 
-  val secret: SigningSecret = "7e162b0fd1bf1ca4537afa4246368c2c"
+  val secret: SigningSecret = "7e162b0fd1bf1ca4537afa4246368c2c" // not a real secret
 
   override def run: IO[Unit] =
     SlashCommandBotBuilder[IO](secret)
