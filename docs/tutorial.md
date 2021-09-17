@@ -8,7 +8,7 @@ We'll make use of https://www.spaceflightnewsapi.net/ - a simple, open API offer
 We will deploy a `/spacenews` slash command that:
 * takes a search term argument, e.g `/spacenews nasa`
 * queries `GET https://api.spaceflightnewsapi.net/v3/articles?_limit=3&title_contains=nasa`
-* formats the results in a pretty list (see the end of this tutorial for the finished product)
+* formats the results in a pretty list:
 
 ![a working command](https://user-images.githubusercontent.com/885049/133719900-9336c55a-b3d3-4900-bcf7-0547a77e6159.png)
 
