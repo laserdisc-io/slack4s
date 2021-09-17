@@ -74,7 +74,7 @@ SlashCommandBotBuilder[IO](secret)
   .serve
 ```
 
-If your hosting (e.g. k8s, AWS ECS) needs a health check endpoint, use: 
+If your container runtime (e.g. k8s, AWS ECS) needs a health check endpoint, use: 
 
 ```
 https://{your-base-url}/healthCheck
