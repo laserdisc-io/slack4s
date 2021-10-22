@@ -5,9 +5,9 @@ object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"          % "0.7.29" % Test,
-      "org.mockito"   % "mockito-core"    % "3.12.4" % Test,
-      "org.gnieh"     %% f"diffson-circe" % "4.1.1"
+      "org.scalameta" %% "munit"         % "0.7.29" % Test,
+      "org.mockito"   % "mockito-core"   % "4.0.0" % Test,
+      "org.gnieh"     %% "diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -30,7 +30,7 @@ object Dependencies {
     )
   )
 
-  val Http4sVersion = "0.23.3"
+  val Http4sVersion = "0.23.6"
   val Http4s = Seq(
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl"          % Http4sVersion,
