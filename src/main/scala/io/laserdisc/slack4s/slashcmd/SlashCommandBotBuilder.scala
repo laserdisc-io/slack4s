@@ -3,7 +3,6 @@ package io.laserdisc.slack4s.slashcmd
 import cats.effect._
 import cats.implicits._
 import eu.timepit.refined.auto._
-import io.laserdisc.slack4s.internal._
 import io.laserdisc.slack4s.slack.internal.SlackAPIClient
 import io.laserdisc.slack4s.slashcmd.SlashCommandBotBuilder.Defaults
 import io.laserdisc.slack4s.slashcmd.internal.SignatureValidator._
@@ -16,14 +15,11 @@ import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import slack4s.BuildInfo
 
-import scala.concurrent.ExecutionContext
-
 object SlashCommandBotBuilder {
 
   object Defaults {
-    val ExecutionCtx: ExecutionContext = mkCachedThreadPool("cmd-bot-svc")
-    val BindPort: BindPort             = 8080
-    val BindAddress: BindAddress       = "0.0.0.0"
+    val BindPort: BindPort       = 8080
+    val BindAddress: BindAddress = "0.0.0.0"
   }
 
   def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
@@ -32,7 +28,6 @@ object SlashCommandBotBuilder {
 
 class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   signingSecret: SigningSecret,
-  ec: ExecutionContext = Defaults.ExecutionCtx,
   bindPort: BindPort = Defaults.BindPort,
   bindAddress: BindAddress = Defaults.BindAddress,
   commandParser: Option[CommandMapper[F]] = None,
@@ -46,7 +41,6 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   import dsl._
 
   private[this] def copy(
-    ec: ExecutionContext = ec,
     signingSecret: SigningSecret = signingSecret,
     bindPort: BindPort = bindPort,
     bindAddress: BindAddress = bindAddress,
@@ -54,7 +48,6 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
   ): Self =
     new SlashCommandBotBuilder(
-      ec = ec,
       signingSecret = signingSecret,
       bindPort = bindPort,
       bindAddress = bindAddress,
@@ -81,7 +74,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
         cmdRunner.processBGCommandQueue
           .concurrently(
             http4sBuilder(
-              BlazeServerBuilder[F](ec)
+              BlazeServerBuilder[F]
                 .bindHttp(bindPort, bindAddress)
                 .withBanner(Banner)
                 .withHttpApp(buildHttpApp(cmdRunner))

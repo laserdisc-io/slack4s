@@ -14,7 +14,6 @@ import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
 import java.time.Instant
-import scala.concurrent.ExecutionContext.global
 
 object SpaceNewsExample extends IOApp.Simple {
 
@@ -64,7 +63,7 @@ object SpaceNewsExample extends IOApp.Simple {
     )
 
   def querySpaceNews(word: String): IO[List[SpaceNewsArticle]] =
-    BlazeClientBuilder[IO](global).resource.use {
+    BlazeClientBuilder[IO].resource.use {
       _.fetchAs[List[SpaceNewsArticle]](
         Request[IO](
           GET,
