@@ -2,14 +2,11 @@ package io.laserdisc.slack4s.slashcmd.internal
 
 import cats.effect.IO
 import com.slack.api.app_backend.SlackSignature
-import com.slack.api.app_backend.SlackSignature.HeaderNames.{
-  X_SLACK_REQUEST_TIMESTAMP,
-  X_SLACK_SIGNATURE
-}
+import com.slack.api.app_backend.SlackSignature.HeaderNames.{X_SLACK_REQUEST_TIMESTAMP, X_SLACK_SIGNATURE}
 import io.laserdisc.slack4s.slack._
 import io.laserdisc.slack4s.slashcmd._
-import org.http4s.Method.{ GET, POST }
-import org.http4s.{ Charset, Header, Headers, Status, UrlForm }
+import org.http4s.Method.{GET, POST}
+import org.http4s.{Charset, Header, Headers, Status, UrlForm}
 import org.http4s.client.dsl.io._
 import org.http4s.implicits.http4sLiteralsSyntax
 import org.typelevel.ci.CIString

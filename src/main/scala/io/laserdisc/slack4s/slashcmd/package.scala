@@ -1,10 +1,10 @@
 package io.laserdisc.slack4s
 
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
-import eu.timepit.refined.api.{ Refined, RefinedTypeOps }
+import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
-import eu.timepit.refined.string.{ MatchesRegex, Url }
+import eu.timepit.refined.string.{MatchesRegex, Url}
 
 package object slashcmd {
 

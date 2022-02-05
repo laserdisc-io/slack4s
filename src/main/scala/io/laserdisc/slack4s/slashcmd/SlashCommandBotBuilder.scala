@@ -10,7 +10,7 @@ import io.laserdisc.slack4s.slashcmd.internal._
 import org.http4s._
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.dsl.Http4sDsl
-import org.http4s.server.{ Router, ServiceErrorHandler }
+import org.http4s.server.{Router, ServiceErrorHandler}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import slack4s.BuildInfo
@@ -27,11 +27,11 @@ object SlashCommandBotBuilder {
 }
 
 class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
-  signingSecret: SigningSecret,
-  bindPort: BindPort = Defaults.BindPort,
-  bindAddress: BindAddress = Defaults.BindAddress,
-  commandParser: Option[CommandMapper[F]] = None,
-  http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
+    signingSecret: SigningSecret,
+    bindPort: BindPort = Defaults.BindPort,
+    bindAddress: BindAddress = Defaults.BindAddress,
+    commandParser: Option[CommandMapper[F]] = None,
+    http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
 ) {
   type Self = SlashCommandBotBuilder[F]
 
@@ -41,11 +41,11 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   import dsl._
 
   private[this] def copy(
-    signingSecret: SigningSecret = signingSecret,
-    bindPort: BindPort = bindPort,
-    bindAddress: BindAddress = bindAddress,
-    commandParser: Option[CommandMapper[F]] = commandParser,
-    http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
+      signingSecret: SigningSecret = signingSecret,
+      bindPort: BindPort = bindPort,
+      bindAddress: BindAddress = bindAddress,
+      commandParser: Option[CommandMapper[F]] = commandParser,
+      http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
   ): Self =
     new SlashCommandBotBuilder(
       signingSecret = signingSecret,
@@ -67,9 +67,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   final def serveStream: fs2.Stream[F, Unit] =
     fs2.Stream
       .resource(SlackAPIClient.resource[F])
-      .evalMap(slackApiClient =>
-        CommandRunner[F](slackApiClient, commandParser.getOrElse(CommandMapper.default[F]))
-      )
+      .evalMap(slackApiClient => CommandRunner[F](slackApiClient, commandParser.getOrElse(CommandMapper.default[F])))
       .flatMap { cmdRunner =>
         cmdRunner.processBGCommandQueue
           .concurrently(
@@ -113,14 +111,12 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
 
   def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
     Router(
-      RouteNames.HEALTHCHECK -> HttpRoutes.of[F] {
-        case GET -> Root =>
-          Ok.apply(s"OK")
+      RouteNames.HEALTHCHECK -> HttpRoutes.of[F] { case GET -> Root =>
+        Ok.apply(s"OK")
       },
       RouteNames.SLACK -> withValidSignature(signingSecret).apply(
-        AuthedRoutes.of[SlackUser, F] {
-          case req @ POST -> Root / SLACK_SLASH_COMMAND as _ =>
-            cmdRunner.processRequest(req)
+        AuthedRoutes.of[SlackUser, F] { case req @ POST -> Root / SLACK_SLASH_COMMAND as _ =>
+          cmdRunner.processRequest(req)
         }
       )
     ).orNotFound

@@ -1,4 +1,4 @@
-import sbt.Keys.{ libraryDependencies, testFrameworks }
+import sbt.Keys.{libraryDependencies, testFrameworks}
 import sbt._
 
 object Dependencies {
@@ -6,7 +6,7 @@ object Dependencies {
   val TestLib = Seq(
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29" % Test,
-      "org.mockito"   % "mockito-core"   % "4.3.1" % Test,
+      "org.mockito"    % "mockito-core"  % "4.3.1"  % Test,
       "org.gnieh"     %% "diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
@@ -22,7 +22,7 @@ object Dependencies {
 
   val Logging = Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel"  %% "log4cats-slf4j" % "2.2.0",
+      "org.typelevel" %% "log4cats-slf4j"  % "2.2.0",
       "ch.qos.logback" % "logback-classic" % "1.2.10" % Test,
       "ch.qos.logback" % "logback-core"    % "1.2.10" % Test,
       "org.slf4j"      % "jcl-over-slf4j"  % "1.7.35" % Test,
