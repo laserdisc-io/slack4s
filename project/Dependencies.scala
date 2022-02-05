@@ -30,7 +30,7 @@ object Dependencies {
     )
   )
 
-  val Http4sVersion = "0.23.6"
+  val Http4sVersion = "0.23.10"
   val Http4s = Seq(
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl"          % Http4sVersion,
