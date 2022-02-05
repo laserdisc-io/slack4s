@@ -1,6 +1,6 @@
 package examples
 
-import cats.effect.{ IO, IOApp }
+import cats.effect.{IO, IOApp}
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.model.block.LayoutBlock
 import eu.timepit.refined.auto._
@@ -75,12 +75,12 @@ object SpaceNewsExample extends IOApp.Simple {
     }
 
   case class SpaceNewsArticle(
-    title: String,
-    url: String,
-    imageUrl: String,
-    newsSite: String,
-    summary: String,
-    updatedAt: Instant
+      title: String,
+      url: String,
+      imageUrl: String,
+      newsSite: String,
+      summary: String,
+      updatedAt: Instant
   )
 
 }

@@ -26,12 +26,12 @@ trait SlashCommandSuite extends FunSuite {
   implicit lazy val runtime: IORuntime = cats.effect.unsafe.implicits.global
 
   def signedSlashCmdRequest(
-    text: String,
-    signingSecret: SigningSecret = DefaultTestSigningSecret,
-    currentTimeMS: Long = System.currentTimeMillis(),
-    responseURL: String = DefaultResponseUrl,
-    userID: String = DefaultUserID,
-    teamID: String = DefaultTeamID
+      text: String,
+      signingSecret: SigningSecret = DefaultTestSigningSecret,
+      currentTimeMS: Long = System.currentTimeMillis(),
+      responseURL: String = DefaultResponseUrl,
+      userID: String = DefaultUserID,
+      teamID: String = DefaultTeamID
   ): Request[IO] = {
 
     // subset of the SlashPayloadCommand payload fields
@@ -58,9 +58,9 @@ trait SlashCommandSuite extends FunSuite {
   }
 
   def testSlashCmdService(
-    commandMapper: CommandMapper[IO],
-    request: Request[IO],
-    waitForCallbacks: Option[(Int, FiniteDuration)] = None
+      commandMapper: CommandMapper[IO],
+      request: Request[IO],
+      waitForCallbacks: Option[(Int, FiniteDuration)] = None
   ): (Response[IO], List[(String, ChatPostMessageRequest)]) = {
 
     for {
@@ -75,10 +75,9 @@ trait SlashCommandSuite extends FunSuite {
 
       // The app starts `runner.processBGCommandQueue` in parallel to the http service,
       // so we run it briefly to capture any background invocations to the slack API as well
-      _ <- waitForCallbacks.fold(IO.unit) {
-            case (takeN, duration) =>
-              runner.processBGCommandQueue.take(takeN).interruptAfter(duration).compile.drain
-          }
+      _ <- waitForCallbacks.fold(IO.unit) { case (takeN, duration) =>
+        runner.processBGCommandQueue.take(takeN).interruptAfter(duration).compile.drain
+      }
 
       // collect the invocations
       apiCalls <- mockAPIClient.getRespondInvocations

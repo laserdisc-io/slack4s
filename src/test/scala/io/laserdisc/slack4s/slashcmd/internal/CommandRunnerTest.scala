@@ -4,9 +4,9 @@ import cats.effect.IO
 import io.laserdisc.slack4s.slack._
 import io.laserdisc.slack4s.slashcmd._
 import org.http4s.circe.CirceEntityCodec._
-import org.http4s.{ Response, Status }
+import org.http4s.{Response, Status}
 
-import scala.concurrent.duration.{ DurationInt, FiniteDuration }
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class CommandRunnerTest extends SlashCommandSuite {
 

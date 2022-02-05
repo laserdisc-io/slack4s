@@ -17,8 +17,8 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 object CommandRunner {
 
   def apply[F[_]: Async](
-    slack: SlackAPIClient[F],
-    mapper: CommandMapper[F]
+      slack: SlackAPIClient[F],
+      mapper: CommandMapper[F]
   ): F[CommandRunner[F]] =
     Queue
       .unbounded[F, (SlashCommandPayload, Command[F])]
@@ -31,18 +31,18 @@ sealed trait CommandRunner[F[_]] {
 }
 
 class CommandRunnerImpl[F[_]: Async](
-  slack: SlackAPIClient[F],
-  mapper: CommandMapper[F],
-  queue: Queue[F, (SlashCommandPayload, Command[F])]
+    slack: SlackAPIClient[F],
+    mapper: CommandMapper[F],
+    queue: Queue[F, (SlashCommandPayload, Command[F])]
 ) extends CommandRunner[F] {
 
   private[this] val logger = Slf4jLogger.getLogger
 
   // log but otherwise ignore failures to send messages to slack
   private[this] def respond(
-    payload: SlashCommandPayload,
-    command: Command[F],
-    response: ChatPostMessageRequest
+      payload: SlashCommandPayload,
+      command: Command[F],
+      response: ChatPostMessageRequest
   ): F[Unit] =
     slack
       .respond(payload.getResponseUrl, response)
@@ -66,19 +66,18 @@ class CommandRunnerImpl[F[_]: Async](
   override def processBGCommandQueue: fs2.Stream[F, Unit] =
     Stream
       .fromQueueUnterminated(queue)
-      .evalMap {
-        case (payload, cmd) =>
-          cmd.handler.attempt.flatMap {
-            case Left(e) =>
-              logger.error(e)(
-                s"CMD-BG-FAIL cmdId:${cmd.logId} reqId=${payload.requestId} e:${e.getMessage}"
-              ) >> respondSomethingWentWrong(payload)
+      .evalMap { case (payload, cmd) =>
+        cmd.handler.attempt.flatMap {
+          case Left(e) =>
+            logger.error(e)(
+              s"CMD-BG-FAIL cmdId:${cmd.logId} reqId=${payload.requestId} e:${e.getMessage}"
+            ) >> respondSomethingWentWrong(payload)
 
-            case Right(res) =>
-              logger.info(
-                s"CMD-BG-SUCCESS cmdId:${cmd.logId} reqId=${payload.requestId} message:${res.getBlocks}"
-              ) >> respond(payload, cmd, res)
-          }
+          case Right(res) =>
+            logger.info(
+              s"CMD-BG-SUCCESS cmdId:${cmd.logId} reqId=${payload.requestId} message:${res.getBlocks}"
+            ) >> respond(payload, cmd, res)
+        }
       }
 
   def execute(payload: SlashCommandPayload, cmd: Command[F]): F[Response[F]] =
@@ -101,11 +100,11 @@ class CommandRunnerImpl[F[_]: Async](
   override def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
     ar.req.decode[SlashCommandPayload] { payload =>
       for {
-        _   <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
+        _ <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
         cmd = mapper(payload)
         _ <- logger.info(
-              s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
-            )
+          s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
+        )
         res <- execute(payload, cmd)
       } yield res
     }

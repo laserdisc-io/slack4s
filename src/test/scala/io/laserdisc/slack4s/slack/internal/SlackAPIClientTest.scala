@@ -1,7 +1,7 @@
 package io.laserdisc.slack4s.slack.internal
 
 import cats.effect.unsafe.implicits.global
-import cats.effect.{ IO, Resource }
+import cats.effect.{IO, Resource}
 import io.circe.Json
 import io.circe.optics.JsonPath.root
 import io.laserdisc.slack4s.slack._

@@ -1,6 +1,6 @@
 package io.laserdisc.slack4s.slashcmd.internal
-import cats.data.{ Kleisli, OptionT }
-import cats.effect.{ Async, Sync }
+import cats.data.{Kleisli, OptionT}
+import cats.effect.{Async, Sync}
 import cats.implicits._
 import com.slack.api.app_backend.SlackSignature
 import com.slack.api.app_backend.SlackSignature.HeaderNames._
@@ -21,7 +21,7 @@ object SignatureValidator {
     Kleisli(_ => OptionT.pure(Response[F](Status.Unauthorized)))
 
   def withValidSignature[F[_]: Async](
-    signingSecret: String
+      signingSecret: String
   ): AuthMiddleware[F, SlackUser] = {
 
     val logger = Slf4jLogger.getLogger[F]

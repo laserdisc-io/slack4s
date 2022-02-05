@@ -49,26 +49,26 @@ package object slack {
       .build()
 
   def markdownWithImgSection(
-    markdown: String,
-    imageUrl: URL,
-    imageAlt: String
+      markdown: String,
+      imageUrl: URL,
+      imageAlt: String
   ): LayoutBlock =
     markdownWithImgSection(markdown, imageUrl, imageAlt, Seq.empty)
 
   def markdownWithImgSection(
-    markdown: String,
-    imageUrl: URL,
-    imageAlt: String,
-    fieldsHead: String,
-    fieldsTail: String*
+      markdown: String,
+      imageUrl: URL,
+      imageAlt: String,
+      fieldsHead: String,
+      fieldsTail: String*
   ): LayoutBlock =
     markdownWithImgSection(markdown, imageUrl, imageAlt, fieldsHead +: fieldsTail)
 
   def markdownWithImgSection(
-    markdown: String,
-    imageUrl: URL,
-    imageAlt: String,
-    fields: Seq[String]
+      markdown: String,
+      imageUrl: URL,
+      imageAlt: String,
+      fields: Seq[String]
   ): LayoutBlock = {
 
     val builder = SectionBlock
