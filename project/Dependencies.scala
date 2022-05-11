@@ -1,36 +1,37 @@
 import sbt.Keys.{libraryDependencies, testFrameworks}
 import sbt._
 
+//noinspection TypeAnnotation
 object Dependencies {
 
   val TestLib = Seq(
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29" % Test,
-      "org.mockito"    % "mockito-core"  % "4.3.1"  % Test,
+      "org.mockito"    % "mockito-core"  % "4.5.1"  % Test,
       "org.gnieh"     %% "diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.18.0"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.22.1"
   )
 
   val Refined = Seq(
-    libraryDependencies += "eu.timepit" %% "refined" % "0.9.28"
+    libraryDependencies += "eu.timepit" %% "refined" % "0.9.29"
   )
 
   val Logging = Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "log4cats-slf4j"  % "2.2.0",
-      "ch.qos.logback" % "logback-classic" % "1.2.10" % Test,
-      "ch.qos.logback" % "logback-core"    % "1.2.10" % Test,
-      "org.slf4j"      % "jcl-over-slf4j"  % "1.7.35" % Test,
-      "org.slf4j"      % "jul-to-slf4j"    % "1.7.35" % Test
+      "org.typelevel" %% "log4cats-slf4j"  % "2.3.1",
+      "ch.qos.logback" % "logback-classic" % "1.2.11" % Test,
+      "ch.qos.logback" % "logback-core"    % "1.2.11" % Test,
+      "org.slf4j"      % "jcl-over-slf4j"  % "1.7.36" % Test,
+      "org.slf4j"      % "jul-to-slf4j"    % "1.7.36" % Test
     )
   )
 
-  val Http4sVersion = "0.23.10"
+  val Http4sVersion = "0.23.11"
   val Http4s = Seq(
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl"          % Http4sVersion,
