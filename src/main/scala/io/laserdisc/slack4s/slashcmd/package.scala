@@ -20,6 +20,6 @@ package object slashcmd {
   object BindPort      extends RefinedTypeOps[BindPort, Int]
   object BindAddress   extends RefinedTypeOps[BindAddress, String]
 
-  type CommandMapper[F[_]] = SlashCommandPayload => Command[F]
+  type CommandMapper[F[_]] = SlashCommandPayload => F[Command[F]]
 
 }

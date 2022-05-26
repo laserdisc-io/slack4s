@@ -27,24 +27,28 @@ object SpaceNewsExample extends IOApp.Simple {
   def mapper: CommandMapper[IO] = { (payload: SlashCommandPayload) =>
     payload.getText.trim match {
       case "" =>
-        Command(
-          handler = IO.pure(slackMessage(headerSection("Please provide a search term!"))),
-          responseType = Immediate
+        IO(
+          Command(
+            handler = IO.pure(slackMessage(headerSection("Please provide a search term!"))),
+            responseType = Immediate
+          )
         )
       case searchTerm =>
-        Command(
-          handler = querySpaceNews(searchTerm).map {
-            case Seq() =>
-              slackMessage(
-                headerSection(s"No results for: $searchTerm")
-              )
-            case articles =>
-              slackMessage(
-                headerSection(s"Space news results for: $searchTerm")
-                  +: articles.flatMap(formatNewsArticle)
-              )
-          },
-          responseType = Delayed
+        IO(
+          Command(
+            handler = querySpaceNews(searchTerm).map {
+              case Seq() =>
+                slackMessage(
+                  headerSection(s"No results for: $searchTerm")
+                )
+              case articles =>
+                slackMessage(
+                  headerSection(s"Space news results for: $searchTerm")
+                    +: articles.flatMap(formatNewsArticle)
+                )
+            },
+            responseType = Delayed
+          )
         )
     }
   }

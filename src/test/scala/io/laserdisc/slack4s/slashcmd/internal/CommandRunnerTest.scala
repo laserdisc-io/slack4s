@@ -19,9 +19,11 @@ class CommandRunnerTest extends SlashCommandSuite {
 
     val (response, callbacks) = testSlashCmdService(
       payload =>
-        Command(
-          handler = IO.pure(slackMessage(textSection(s"hello ${payload.getText}"))),
-          responseType = Immediate
+        IO(
+          Command(
+            handler = IO.pure(slackMessage(textSection(s"hello ${payload.getText}"))),
+            responseType = Immediate
+          )
         ),
       signedSlashCmdRequest(text = "lenny"),
       waitForCallbacks
@@ -41,9 +43,11 @@ class CommandRunnerTest extends SlashCommandSuite {
 
     val (response, callbacks) = testSlashCmdService(
       payload =>
-        Command(
-          handler = IO.pure(slackMessage(headerSection(s"--- ${payload.getText} ---"))),
-          responseType = Delayed
+        IO(
+          Command(
+            handler = IO.pure(slackMessage(headerSection(s"--- ${payload.getText} ---"))),
+            responseType = Delayed
+          )
         ),
       signedSlashCmdRequest(text = "foo bar", responseURL = CallbackURL),
       waitForCallbacks
@@ -68,9 +72,11 @@ class CommandRunnerTest extends SlashCommandSuite {
 
     val (response, callbacks) = testSlashCmdService(
       payload =>
-        Command(
-          handler = IO.pure(slackMessage(markdownSection(s"you sent: ${payload.getText}"))),
-          responseType = DelayedWithMsg(DelayMessage)
+        IO(
+          Command(
+            handler = IO.pure(slackMessage(markdownSection(s"you sent: ${payload.getText}"))),
+            responseType = DelayedWithMsg(DelayMessage)
+          )
         ),
       signedSlashCmdRequest(text = "woof", responseURL = CallbackURL),
       waitForCallbacks

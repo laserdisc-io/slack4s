@@ -103,12 +103,12 @@ SlashCommandBotBuilder[IO](secret)
 `CommandMapper[F]` is a type alias for: 
 
 ```scala
-SlashCommandPayload => Command[F]
+SlashCommandPayload => F[Command[F]]
 ```
 
-Your implementation of this function defines your business logic.  The input is the slash command request from Slack. The output defines how to respond to that request.
+Your implementation of this effect defines your business logic.  The input is the slash command request from Slack. The output defines how to respond to that request.
 
-Slack4s will only invoke this function if the incoming request's slack signature has been validated against your signing secret.
+Slack4s will only evaluate this effect if the incoming request's slack signature has been validated against your signing secret.
 
 ### `SlashCommandPayload`
  

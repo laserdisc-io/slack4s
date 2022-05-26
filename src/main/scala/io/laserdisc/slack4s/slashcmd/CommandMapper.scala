@@ -13,15 +13,17 @@ object CommandMapper {
   // $COVERAGE-OFF$
   def default[F[_]: Sync]: CommandMapper[F] =
     (payload: SlashCommandPayload) =>
-      Command(
-        handler = getLogger
-          .warn(
-            s"Responding with default message; To configure your own processor, see $ProjectRepo"
-          )
-          .as(helloFromSlack4s(payload)),
-        responseType = Immediate,
-        logId = "GETTING-STARTED"
-      )
+      Sync[F].delay {
+        Command(
+          handler = getLogger
+            .warn(
+              s"Responding with default message; To configure your own processor, see $ProjectRepo"
+            )
+            .as(helloFromSlack4s(payload)),
+          responseType = Immediate,
+          logId = "GETTING-STARTED"
+        )
+      }
   // $COVERAGE-ON$
 
 }

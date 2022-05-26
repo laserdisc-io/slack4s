@@ -122,8 +122,10 @@ class SignatureValidatorTest extends SlashCommandSuite {
   }
 
   lazy val defaultMapper: CommandMapper[IO] = payload =>
-    Command(
-      handler = IO.pure(slackMessage(textSection(s"hello ${payload.getText}"))),
-      responseType = Immediate
+    IO(
+      Command(
+        handler = IO.pure(slackMessage(textSection(s"hello ${payload.getText}"))),
+        responseType = Immediate
+      )
     )
 }
