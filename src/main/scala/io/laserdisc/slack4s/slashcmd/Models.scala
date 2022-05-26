@@ -67,3 +67,17 @@ case object Delayed extends ResponseType
   *   The intermediate message - e.g. "This might take a little while, please wait..."
   */
 case class DelayedWithMsg(msg: ChatPostMessageRequest) extends ResponseType
+
+/** For configuring the endpoint names that the slackbot listens for
+  * @param healthCheckRoot
+  *   The endpoint that responds to GET call for container health (e.g. "/healthCheck")
+  * @param slackRoot
+  *   The root of the signature-protected slack-related calls (e.g. "/slack")
+  * @param slackSlashCmd
+  *   The `slackRoot`-nested endpoint for the POST command for slash commands (e.g. "slashCmd")
+  */
+case class EndpointConfig(
+    healthCheckRoot: String,
+    slackRoot: String,
+    slackSlashCmd: String
+)

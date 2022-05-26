@@ -20,6 +20,11 @@ object SlashCommandBotBuilder {
   object Defaults {
     val BindPort: BindPort       = 8080
     val BindAddress: BindAddress = "0.0.0.0"
+    val EndpointCfg: EndpointConfig = EndpointConfig(
+      healthCheckRoot = "/healthCheck",
+      slackRoot = "/slack",
+      slackSlashCmd = "slashCmd"
+    )
   }
 
   def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
@@ -30,6 +35,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     signingSecret: SigningSecret,
     bindPort: BindPort = Defaults.BindPort,
     bindAddress: BindAddress = Defaults.BindAddress,
+    endpointCfg: EndpointConfig = Defaults.EndpointCfg,
     commandParser: Option[CommandMapper[F]] = None,
     http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
 ) {
@@ -44,6 +50,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       signingSecret: SigningSecret = signingSecret,
       bindPort: BindPort = bindPort,
       bindAddress: BindAddress = bindAddress,
+      endpointCfg: EndpointConfig = endpointCfg,
       commandParser: Option[CommandMapper[F]] = commandParser,
       http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
   ): Self =
@@ -51,12 +58,16 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       signingSecret = signingSecret,
       bindPort = bindPort,
       bindAddress = bindAddress,
+      endpointCfg = endpointCfg,
       commandParser = commandParser,
       http4sBuilder = http4sBuilder
     )
 
   def withBindOptions(port: BindPort, address: BindAddress = "0.0.0.0"): Self =
     copy(bindPort = port, bindAddress = address)
+
+  def withEndpointConfig(endpointCfgUpdate: EndpointConfig => EndpointConfig): Self =
+    copy(endpointCfg = endpointCfgUpdate(Defaults.EndpointCfg))
 
   def withHttp4sBuilder(http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F]): Self =
     copy(http4sBuilder = http4sBuilder)
@@ -88,13 +99,6 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     Seq(msg.map(_ => '-'), msg, msg.map(_ => '-'))
   }
 
-  private[this] object RouteNames {
-    val HEALTHCHECK = "/healthCheck"
-    val SLACK       = "/slack"
-  }
-
-  private[this] val SLACK_SLASH_COMMAND = "slashCmd"
-
   def errorHandler: ServiceErrorHandler[F] =
     req => {
       case ex: AuthError =>
@@ -111,11 +115,11 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
 
   def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
     Router(
-      RouteNames.HEALTHCHECK -> HttpRoutes.of[F] { case GET -> Root =>
+      endpointCfg.healthCheckRoot -> HttpRoutes.of[F] { case GET -> Root =>
         Ok.apply(s"OK")
       },
-      RouteNames.SLACK -> withValidSignature(signingSecret).apply(
-        AuthedRoutes.of[SlackUser, F] { case req @ POST -> Root / SLACK_SLASH_COMMAND as _ =>
+      endpointCfg.slackRoot -> withValidSignature(signingSecret).apply(
+        AuthedRoutes.of[SlackUser, F] { case req @ POST -> Root / `endpointCfg`.slackSlashCmd as _ =>
           cmdRunner.processRequest(req)
         }
       )
