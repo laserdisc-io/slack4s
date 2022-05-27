@@ -202,8 +202,11 @@ def formatNewsArticle(article: SpaceNewsArticle): Seq[LayoutBlock] =
 
 ```
 
-Now it is time to implement the `CommandMapper[F]` - a type alias for `SlashCommandPayload -> Command[F]` that will map the 
-payload that slack4s decodes for you into the handler for the that input.  See [README.md](../README.md) for more detail.
+Now it is time to implement the `CommandMapper[F]` - a type alias for `SlashCommandPayload -> F[Command[F]]`.  This function
+maps the payload (that slack4s decodes and validates for you) into the handler for the that input.  This mapping logic itself
+is contained in an effect `F` (so that it can be composed with other effectful behaviour, e.g. logging as you parse your commands).
+
+See [README.md](../README.md) for more detail.
 
 In our case, there's no complex parsing or pattern matching.  We'll just ensure that _something_ was entered, and
 blindly pass it to the API call.  :warning: this is just a simple demo - Please ensure you carefully sanitize all input that 

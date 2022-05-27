@@ -11,14 +11,14 @@ import eu.timepit.refined.auto._
   *   https://api.slack.com/tools/block-kit-builder
   * @param responseType
   *   Whether this command is evaluated immediately and response returned, or processed in the background, and returned later. See
-  *   `ResponseType` for more.
+  *   `ResponseType` for more. Defaults to [[Delayed]]
   * @param logId
   *   By default `NA`, this is simply a (alphanumeric, dashes and underscores only) string which will be used in log messages, useful for
   *   filtering logs for particular command type output.
   */
 case class Command[F[_]](
     handler: F[ChatPostMessageRequest],
-    responseType: ResponseType,
+    responseType: ResponseType = Delayed,
     logId: LogToken = "NA"
 )
 
