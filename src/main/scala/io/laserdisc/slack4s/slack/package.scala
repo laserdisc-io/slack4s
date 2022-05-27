@@ -8,6 +8,7 @@ import com.slack.api.model.block.element._
 import io.laserdisc.slack4s.slashcmd.URL
 
 import scala.jdk.CollectionConverters._
+import scala.util.matching.Regex
 
 package object slack {
 
@@ -117,16 +118,25 @@ package object slack {
 
   implicit class SlashCommandPayloadOps(val p: SlashCommandPayload) extends AnyVal {
 
-    /* Trying a hack to get a (relatively) unique & short request ID using triggerID
-     * Trigger IDs are a period-separated sequence of alphanumerics of which the third
-     * appears distinctly random.  We'll try just using the last few chars, and see if
-     * it's random _enough_ to differentiate a slackbot's requests */
+    /** A hack to get a (relatively) unique & short request ID using triggerID Trigger IDs are a period-separated sequence of alphanumerics
+      * of which the third appears distinctly random. We'll try just using the last few chars, and see if it's random _enough_ to
+      * differentiate a slackbot's requests
+      */
     def requestId: String =
       Option(p.getTriggerId)
         .map(_.trim.takeRight(8))
-        .filter(!_.isEmpty)
+        .filter(_.nonEmpty)
         .getOrElse("n/a")
 
+    /** Load the sanitized payload text, where all characters not matching the regex are dropped
+      * @param regex
+      *   Match 'safe' characters. Default is alphanumeric, dashes and spaces: `"[^A-Za-z0-9\\-\\s]"`
+      */
+    def sanitizedText(regex: Regex = "[^A-Za-z0-9\\-\\s]".r): String =
+      Option(p.getText)
+        .map(_.trim)
+        .map(_.replaceAll(regex.regex, ""))
+        .getOrElse("")
   }
 
 }
