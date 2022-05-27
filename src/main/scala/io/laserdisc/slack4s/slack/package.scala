@@ -95,6 +95,13 @@ package object slack {
 
   def dividerSection: LayoutBlock = DividerBlock.builder().build()
 
+  def imageBlock(url: String, altText: String): ImageBlock =
+    ImageBlock
+      .builder()
+      .imageUrl(url)
+      .altText(altText)
+      .build()
+
   def imageElement(url: String, altText: String): ImageElement =
     ImageElement
       .builder()
