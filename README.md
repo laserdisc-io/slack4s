@@ -65,13 +65,6 @@ The builder has some more useful functions if you need to customize your deploym
 SlashCommandBotBuilder[IO](secret)
   .withCommandMapper(testCommandMapper)                   // your mapper impl, see next section
   .withBindOptions(port = 9999, address = "192.168.0.1")  // by default, binds to 0.0.0.0:8080
-  .withEndpointConfig(defaultEC =>                        // endpoint config is a case class, this method gives you the default config and allows you to override via copy
-    defaultEC.copy(                                       //   the values shown are the defaults
-      healthCheckRoot = "/healthCheck",                   //   - GET /healthCheck for health check            
-      slackRoot = "/slack",                               //   - root of all signature-protected slack endpoints (there's only 1 right now)
-      slackSlashCmd = "slashCmd"                          //   - POST /slack/slashCmd for the slack command handler entrypoint
-    )
-  )
   .withHttp4sBuilder{                                    
     // offer the chance to customize http4s' BlazeServerBuilder used under the hood 
     // USE WITH CAUTION; it overrides any settings set by slack4s     

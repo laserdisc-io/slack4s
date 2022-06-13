@@ -8,7 +8,7 @@ import io.laserdisc.slack4s.slashcmd.SlashCommandBotBuilder.Defaults
 import io.laserdisc.slack4s.slashcmd.internal.SignatureValidator._
 import io.laserdisc.slack4s.slashcmd.internal._
 import org.http4s._
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.blaze.server._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.{Router, ServiceErrorHandler}
 import org.typelevel.log4cats.Logger
@@ -18,13 +18,9 @@ import slack4s.BuildInfo
 object SlashCommandBotBuilder {
 
   object Defaults {
-    val BindPort: BindPort       = 8080
-    val BindAddress: BindAddress = "0.0.0.0"
-    val EndpointCfg: EndpointConfig = EndpointConfig(
-      healthCheckRoot = "/healthCheck",
-      slackRoot = "/slack",
-      slackSlashCmd = "slashCmd"
-    )
+    val BindPort: BindPort         = 8080
+    val BindAddress: BindAddress   = "0.0.0.0"
+    val EndpointRoot: EndpointRoot = "/"
   }
 
   def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
@@ -35,7 +31,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     signingSecret: SigningSecret,
     bindPort: BindPort = Defaults.BindPort,
     bindAddress: BindAddress = Defaults.BindAddress,
-    endpointCfg: EndpointConfig = Defaults.EndpointCfg,
+    endpointRoot: EndpointRoot = Defaults.EndpointRoot,
     commandParser: Option[CommandMapper[F]] = None,
     http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
 ) {
@@ -50,7 +46,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       signingSecret: SigningSecret = signingSecret,
       bindPort: BindPort = bindPort,
       bindAddress: BindAddress = bindAddress,
-      endpointCfg: EndpointConfig = endpointCfg,
+      endpointRoot: EndpointRoot = endpointRoot,
       commandParser: Option[CommandMapper[F]] = commandParser,
       http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
   ): Self =
@@ -58,7 +54,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       signingSecret = signingSecret,
       bindPort = bindPort,
       bindAddress = bindAddress,
-      endpointCfg = endpointCfg,
+      endpointRoot = endpointRoot,
       commandParser = commandParser,
       http4sBuilder = http4sBuilder
     )
@@ -66,8 +62,8 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   def withBindOptions(port: BindPort, address: BindAddress = "0.0.0.0"): Self =
     copy(bindPort = port, bindAddress = address)
 
-  def withEndpointConfig(endpointCfgUpdate: EndpointConfig => EndpointConfig): Self =
-    copy(endpointCfg = endpointCfgUpdate(Defaults.EndpointCfg))
+  def withEndpointRoot(root: EndpointRoot): Self =
+    copy(endpointRoot = root)
 
   def withHttp4sBuilder(http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F]): Self =
     copy(http4sBuilder = http4sBuilder)
@@ -115,11 +111,11 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
 
   def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
     Router(
-      endpointCfg.healthCheckRoot -> HttpRoutes.of[F] { case GET -> Root =>
+      s"${endpointRoot.value}healthCheck" -> HttpRoutes.of[F] { case GET -> Root =>
         Ok.apply(s"OK")
       },
-      endpointCfg.slackRoot -> withValidSignature(signingSecret).apply(
-        AuthedRoutes.of[SlackUser, F] { case req @ POST -> Root / `endpointCfg`.slackSlashCmd as _ =>
+      s"${endpointRoot.value}slack" -> withValidSignature(signingSecret).apply(
+        AuthedRoutes.of[SlackUser, F] { case req @ POST -> Root / "slashCmd" as _ =>
           cmdRunner.processRequest(req)
         }
       )

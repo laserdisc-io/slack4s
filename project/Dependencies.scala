@@ -7,14 +7,14 @@ object Dependencies {
   val TestLib = Seq(
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29" % Test,
-      "org.mockito"    % "mockito-core"  % "4.5.1"  % Test,
+      "org.mockito"    % "mockito-core"  % "4.6.1"  % Test,
       "org.gnieh"     %% "diffson-circe" % "4.1.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.22.1"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.22.2"
   )
 
   val Refined = Seq(
@@ -31,7 +31,7 @@ object Dependencies {
     )
   )
 
-  val Http4sVersion = "0.23.11"
+  val Http4sVersion = "0.23.12"
   val Http4s = Seq(
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl"          % Http4sVersion,
