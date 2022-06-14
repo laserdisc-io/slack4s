@@ -82,7 +82,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
               BlazeServerBuilder[F]
                 .bindHttp(bindPort, bindAddress)
                 .withBanner(Banner)
-                .withHttpApp(buildHttpApp(cmdRunner))
+                .withHttpApp(org.http4s.server.middleware.Logger.httpApp(logHeaders = true, logBody = false)(buildHttpApp(cmdRunner)))
                 .withServiceErrorHandler(errorHandler)
             ).serve
           )
