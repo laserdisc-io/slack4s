@@ -12,16 +12,16 @@ jobs:
     strategy:
       matrix:
         scala:
-          - 2.13.8
+          - 2.13.10
         java:
-          - adopt@1.11
-          - adopt@1.15
+          - corretto@1.11
+          - corretto@1.17
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
     runs-on: ${{ matrix.os }}
     steps:
       - name: Branch Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.5.0
         with:
           fetch-depth: 0
       - name: Install Java And Sbt
