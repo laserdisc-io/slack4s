@@ -7,27 +7,27 @@ object Dependencies {
   val TestLib = Seq(
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29" % Test,
-      "org.mockito"    % "mockito-core"  % "4.6.1"  % Test,
-      "org.gnieh"     %% "diffson-circe" % "4.1.1"
+      "org.mockito"    % "mockito-core"  % "4.8.1"  % Test,
+      "org.gnieh"     %% "diffson-circe" % "4.3.0"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.22.2"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.26.1"
   )
 
   val Refined = Seq(
-    libraryDependencies += "eu.timepit" %% "refined" % "0.9.29"
+    libraryDependencies += "eu.timepit" %% "refined" % "0.10.1"
   )
 
   val Logging = Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "log4cats-slf4j"  % "2.3.1",
-      "ch.qos.logback" % "logback-classic" % "1.2.11" % Test,
-      "ch.qos.logback" % "logback-core"    % "1.2.11" % Test,
-      "org.slf4j"      % "jcl-over-slf4j"  % "1.7.36" % Test,
-      "org.slf4j"      % "jul-to-slf4j"    % "1.7.36" % Test
+      "org.typelevel" %% "log4cats-slf4j"  % "2.5.0",
+      "ch.qos.logback" % "logback-classic" % "1.4.4" % Test,
+      "ch.qos.logback" % "logback-core"    % "1.4.4" % Test,
+      "org.slf4j"      % "jcl-over-slf4j"  % "2.0.3" % Test,
+      "org.slf4j"      % "jul-to-slf4j"    % "2.0.3" % Test
     )
   )
 
