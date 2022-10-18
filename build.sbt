@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.10"
 
 lazy val publishSettings = Seq(
   Test / publishArtifact := false,
@@ -54,6 +54,6 @@ lazy val root = project
     buildInfoPackage := "slack4s",
     addCommandAlias("format", ";scalafmtAll;scalafmtSbt"),
     addCommandAlias("checkFormat", ";scalafmtCheckAll;scalafmtSbtCheck"),
-    addCommandAlias("fullTest", ";clean;checkFormat;coverage;test;coverageReport")
+    addCommandAlias("fullTest", ";clean;checkFormat;test")
   )
   .enablePlugins(BuildInfoPlugin, GitVersioning)
