@@ -3,8 +3,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-<!--            <pattern>%date %highlight(%level) [%logger{0}/%thread] %message%n%xException</pattern>-->
-            <pattern>%date %highlight(%level) %logger{3} [%thread] %message%n%xException</pattern>
+            <pattern>%date %highlight(%level) %logger{3} [%thread][%X] %message%n%xException</pattern>
         </encoder>
     </appender>
 
