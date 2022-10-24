@@ -47,7 +47,6 @@ object Dependencies {
       "io.circe" %% "circe-core"           % CirceVersion,
       "io.circe" %% "circe-generic"        % CirceVersion,
       "io.circe" %% "circe-generic-extras" % CirceVersion,
-      "io.circe" %% "circe-parser"         % CirceVersion,
       "io.circe" %% "circe-optics"         % CirceVersion
     )
   )
