@@ -42,7 +42,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
   }
 
-  test("HTTP 401 if a null command is received") {
+  test("HTTP 400 if a null command is received") {
 
     val payload     = UrlForm("text" -> "whatever")
     val signatureTS = System.currentTimeMillis().toString
