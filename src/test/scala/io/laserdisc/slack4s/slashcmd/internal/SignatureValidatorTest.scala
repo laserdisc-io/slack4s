@@ -23,7 +23,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
   test("control case - HTTP 200 when valid signature is provided") {
 
-    val payload     = UrlForm("text" -> "whatever")
+    val payload     = UrlForm("text" -> "whatever", "command" -> "hello")
     val signatureTS = System.currentTimeMillis().toString
     val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
@@ -39,6 +39,27 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
     val (response, _) = testSlashCmdService(defaultMapper, req)
     assertEquals(response.status, Status.Ok)
+
+  }
+
+  test("HTTP 401 if a null command is received") {
+
+    val payload     = UrlForm("text" -> "whatever")
+    val signatureTS = System.currentTimeMillis().toString
+    val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
+      .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
+
+    val req = POST(
+      payload,
+      uri"http://domain-does-not-matter.com/slack/slashCmd",
+      Headers(
+        Header.Raw(CIString(X_SLACK_SIGNATURE), signature),
+        Header.Raw(CIString(X_SLACK_REQUEST_TIMESTAMP), signatureTS)
+      )
+    )
+
+    val (response, _) = testSlashCmdService(defaultMapper, req)
+    assertEquals(response.status, Status.BadRequest)
 
   }
 

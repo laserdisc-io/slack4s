@@ -1,5 +1,6 @@
 package io.laserdisc.slack4s
 
+import cats.data.Validated
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Positive
@@ -23,5 +24,9 @@ package object slashcmd {
   object EndpointRoot  extends RefinedTypeOps[EndpointRoot, String]
 
   type CommandMapper[F[_]] = SlashCommandPayload => F[Command[F]]
+
+  implicit def validCommand(commandPayload: SlashCommandPayload): Validated[PayloadError, SlashCommandPayload] =
+    if (commandPayload.getCommand == null) Validated.invalid(MissingPayloadField("Command field was null"))
+    else Validated.valid(commandPayload)
 
 }

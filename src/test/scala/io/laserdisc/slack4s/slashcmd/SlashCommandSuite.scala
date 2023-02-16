@@ -27,6 +27,7 @@ trait SlashCommandSuite extends FunSuite {
 
   def signedSlashCmdRequest(
       text: String,
+      command: String = "hello",
       signingSecret: SigningSecret = DefaultTestSigningSecret,
       currentTimeMS: Long = System.currentTimeMillis(),
       responseURL: String = DefaultResponseUrl,
@@ -37,6 +38,7 @@ trait SlashCommandSuite extends FunSuite {
     // subset of the SlashPayloadCommand payload fields
     val payload = UrlForm(
       "text"         -> text,
+      "command"      -> command,
       "response_url" -> responseURL,
       "team_id"      -> userID,
       "user_id"      -> teamID

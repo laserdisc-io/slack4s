@@ -57,18 +57,13 @@ package object internal {
       private[this] val parser = new SlashCommandPayloadParser()
 
       override def decode(m: Media[F], strict: Boolean): DecodeResult[F, SlashCommandPayload] =
-        DecodeResult.success(
-          m.as[String]
-            .map { str =>
-              Option(parser.parse(str)) match {
-                case Some(v) => v
-                case None =>
-                  throw new IllegalArgumentException(
-                    s"SlashCommandPayload could not be parsed from: $str"
-                  )
-              }
-            }
-        )
+        DecodeResult {
+          for {
+            str    <- m.as[String]
+            parsed <- Sync[F].fromEither(Either.catchNonFatal(parser.parse(str)))
+          } yield parsed
+            .asRight[DecodeFailure]
+        }
 
       override def consumes: Set[MediaRange] = Set(mediaType)
     }
@@ -87,5 +82,4 @@ package object internal {
 
   implicit def postMsgReqHttp4sEncoder[F[_]: Sync]: EntityEncoder[F, ChatPostMessageRequest] =
     jsonEncoderOf[F, ChatPostMessageRequest]
-
 }
