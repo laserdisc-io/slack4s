@@ -3,7 +3,6 @@ package io.laserdisc.slack4s.slack
 import cats.effect.{Async, Sync}
 import cats.implicits._
 import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
-import com.slack.api.app_backend.slash_commands.SlashCommandPayloadParser
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import com.slack.api.model.Attachment.VideoHtml
@@ -16,6 +15,7 @@ import io.circe.parser._
 import io.circe.{Decoder, Encoder}
 import org.http4s._
 import org.http4s.circe.jsonEncoderOf
+import org.http4s.FormDataDecoder._
 
 import scala.util.Try
 
@@ -49,23 +49,58 @@ package object internal {
         throw new IllegalArgumentException(s"Expected 'ok' in body, got $unexpected")
     }
 
-  implicit def commandPayloadDecoder[F[_]: Async]: EntityDecoder[F, SlashCommandPayload] =
-    new EntityDecoder[F, SlashCommandPayload] {
-
-      private[this] val mediaType = MediaType.application.`x-www-form-urlencoded`
-
-      private[this] val parser = new SlashCommandPayloadParser()
-
-      override def decode(m: Media[F], strict: Boolean): DecodeResult[F, SlashCommandPayload] =
-        DecodeResult {
-          for {
-            str    <- m.as[String]
-            parsed <- Sync[F].fromEither(Either.catchNonFatal(parser.parse(str)))
-          } yield parsed
-            .asRight[DecodeFailure]
-        }
-
-      override def consumes: Set[MediaRange] = Set(mediaType)
+  implicit val slashCommandFormDecoder: FormDataDecoder[SlashCommandPayload] =
+    (
+      field[String]("token"),
+      field[String]("team_id"),
+      field[String]("team_domain"),
+      fieldOptional[String]("enterprise_id"),
+      fieldOptional[String]("enterprise_name"),
+      field[String]("api_app_id"),
+      field[String]("channel_id"),
+      field[String]("channel_name"),
+      field[String]("user_id"),
+      field[String]("user_name"),
+      field[String]("command"),
+      field[String]("text"),
+      field[String]("response_url"),
+      field[String]("trigger_id"),
+      field[Boolean]("is_enterprise_install")
+    ).mapN {
+      case (
+            token,
+            teamId,
+            teamDomain,
+            enterpriseId,
+            enterpriseName,
+            apiAppId,
+            channelId,
+            channelName,
+            userId,
+            userName,
+            command,
+            text,
+            responseUrl,
+            triggerId,
+            isEnterpriseInstall
+          ) =>
+        val slashCommandPayload: SlashCommandPayload = new SlashCommandPayload()
+        slashCommandPayload.setToken(token)
+        slashCommandPayload.setTeamId(teamId)
+        slashCommandPayload.setTeamDomain(teamDomain)
+        slashCommandPayload.setEnterpriseId(enterpriseId.getOrElse(""))
+        slashCommandPayload.setEnterpriseName(enterpriseName.getOrElse(""))
+        slashCommandPayload.setApiAppId(apiAppId)
+        slashCommandPayload.setChannelId(channelId)
+        slashCommandPayload.setChannelName(channelName)
+        slashCommandPayload.setUserId(userId)
+        slashCommandPayload.setUserName(userName)
+        slashCommandPayload.setCommand(command)
+        slashCommandPayload.setText(text)
+        slashCommandPayload.setResponseUrl(responseUrl)
+        slashCommandPayload.setTriggerId(triggerId)
+        slashCommandPayload.setEnterpriseInstall(isEnterpriseInstall)
+        slashCommandPayload
     }
 
   implicit val postMsgReqCirceEncoder: Encoder[ChatPostMessageRequest] =

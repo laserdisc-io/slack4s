@@ -1,6 +1,5 @@
 package io.laserdisc.slack4s.slashcmd.internal
 
-import cats.data.Validated
 import cats.effect.Async
 import cats.effect.std.Queue
 import cats.implicits._
@@ -12,6 +11,7 @@ import io.laserdisc.slack4s.slack._
 import io.laserdisc.slack4s.slack.canned._
 import io.laserdisc.slack4s.slack.internal._
 import io.laserdisc.slack4s.slashcmd._
+import org.http4s.FormDataDecoder.formEntityDecoder
 import org.http4s._
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
@@ -101,18 +101,12 @@ class CommandRunnerImpl[F[_]: Async](
   override def processRequest(ar: AuthedRequest[F, SlackUser]): F[Response[F]] =
     ar.req.decode[SlashCommandPayload] { payload =>
       for {
-        _ <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
-        res <- validCommand(payload) match {
-          case Validated.Invalid(error) => logger.error(error.getMessage) *> Response[F](status = Status.BadRequest).pure[F]
-          case Validated.Valid(_) =>
-            for {
-              cmd <- mapper(payload)
-              _ <- logger.info(
-                s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
-              )
-              execRes <- execute(payload, cmd)
-            } yield execRes
-        }
+        _   <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
+        cmd <- mapper(payload)
+        _ <- logger.info(
+          s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
+        )
+        res <- execute(payload, cmd)
       } yield res
     }
 }

@@ -72,3 +72,21 @@ case object Delayed extends ResponseType
   *   The intermediate message - e.g. "This might take a little while, please wait..."
   */
 case class DelayedWithMsg(msg: ChatPostMessageRequest) extends ResponseType
+
+case class ScalaSlashCommandPayload(
+    token: String,
+    apiAppId: String,
+    teamId: String,
+    teamDomain: String,
+    enterpriseId: String,
+    enterpriseName: String,
+    channelId: String,
+    channelName: String,
+    userId: String,
+    userName: String,
+    command: String,
+    text: String,
+    responseUrl: String,
+    triggerId: String,
+    isEnterpriseInstall: Boolean
+)
