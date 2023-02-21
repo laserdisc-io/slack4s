@@ -23,5 +23,4 @@ package object slashcmd {
   object EndpointRoot  extends RefinedTypeOps[EndpointRoot, String]
 
   type CommandMapper[F[_]] = SlashCommandPayload => F[Command[F]]
-
 }

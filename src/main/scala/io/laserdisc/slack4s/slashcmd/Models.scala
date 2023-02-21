@@ -34,6 +34,11 @@ sealed trait AuthError extends Throwable
 case class MissingHeader(headerName: String) extends AuthError {
   override def getMessage: String = s"Missing header: $headerName"
 }
+
+sealed trait PayloadError extends Throwable
+case class MissingPayloadField(error: String) extends PayloadError {
+  override def getMessage: String = s"Missing payload field error: $error"
+}
 case class BadSignature(timestamp: String, body: String, signature: String) extends AuthError {
   override def getMessage: String =
     s"Bad signature:$signature, for timestamp:$timestamp and body:$body"

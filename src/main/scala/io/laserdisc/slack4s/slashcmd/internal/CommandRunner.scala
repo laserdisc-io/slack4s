@@ -11,6 +11,7 @@ import io.laserdisc.slack4s.slack._
 import io.laserdisc.slack4s.slack.canned._
 import io.laserdisc.slack4s.slack.internal._
 import io.laserdisc.slack4s.slashcmd._
+import org.http4s.FormDataDecoder.formEntityDecoder
 import org.http4s._
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
@@ -108,5 +109,4 @@ class CommandRunnerImpl[F[_]: Async](
         res <- execute(payload, cmd)
       } yield res
     }
-
 }

@@ -12,6 +12,7 @@ import org.http4s._
 import org.http4s.server.AuthMiddleware
 import org.typelevel.ci.CIString
 import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.http4s.FormDataDecoder.formEntityDecoder
 
 object SignatureValidator {
 
@@ -41,12 +42,17 @@ object SignatureValidator {
         ts       <- getRequiredHeader(request, X_SLACK_REQUEST_TIMESTAMP)
         sig      <- getRequiredHeader(request, X_SLACK_SIGNATURE)
         bodyText <- request.as[String]
-        payload  <- request.as[SlashCommandPayload]
-        res = Either.cond(
-          slackSignatureVerifier.isValid(ts, bodyText, sig),
-          SlackUser(payload.getTeamId, payload.getUserId),
-          BadSignature(ts, bodyText, sig).toString
-        )
+        payload  <- request.attemptAs[SlashCommandPayload].value
+        res <-
+          payload match {
+            case Left(error) =>
+              logger
+                .error(s"SIG-VALIDATION-FAIL: ${error.message}") *> MissingPayloadField(error.message).toString.asLeft[SlackUser].pure[F]
+            case Right(slashCommandPayload) =>
+              if (slackSignatureVerifier.isValid(ts, bodyText, sig))
+                SlackUser(slashCommandPayload.getTeamId, slashCommandPayload.getUserId).asRight[String].pure[F]
+              else BadSignature(ts, bodyText, sig).toString.asLeft[SlackUser].pure[F]
+          }
         _ <- logger.info(s"SIG-VALIDATION result:$res sig:$sig, ts:$ts, body:$bodyText")
       } yield res
 

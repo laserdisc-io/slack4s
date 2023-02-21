@@ -34,13 +34,7 @@ trait SlashCommandSuite extends FunSuite {
       teamID: String = DefaultTeamID
   ): Request[IO] = {
 
-    // subset of the SlashPayloadCommand payload fields
-    val payload = UrlForm(
-      "text"         -> text,
-      "response_url" -> responseURL,
-      "team_id"      -> userID,
-      "user_id"      -> teamID
-    )
+    val payload = testPayloadForm(text = text, responseUrl = responseURL, userId = userID, teamId = teamID)
 
     val signatureTS = currentTimeMS.toString
     val signature = new SlackSignature.Generator(signingSecret.value)
@@ -85,5 +79,22 @@ trait SlashCommandSuite extends FunSuite {
     } yield (response, apiCalls)
 
   }.unsafeRunSync()
+
+  def testPayloadForm(text: String, responseUrl: String, userId: String, teamId: String): UrlForm =
+    UrlForm(
+      "token"                 -> "token",
+      "api_app_id"            -> "apiAppId",
+      "team_id"               -> teamId,
+      "team_domain"           -> "teamDomain",
+      "channel_id"            -> "channelId",
+      "channel_name"          -> "channelName",
+      "user_id"               -> userId,
+      "user_name"             -> "userName",
+      "command"               -> "command",
+      "text"                  -> text,
+      "response_url"          -> responseUrl,
+      "trigger_id"            -> "triggerId",
+      "is_enterprise_install" -> false.toString
+    )
 
 }

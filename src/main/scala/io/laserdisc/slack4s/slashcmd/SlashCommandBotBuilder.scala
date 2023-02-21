@@ -109,7 +109,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
           .flatMap(_ => InternalServerError("Something went wrong, see the logs."))
     }
 
-  def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
+  def buildHttpRoutes(cmdRunner: CommandRunner[F]): HttpRoutes[F] =
     Router(
       s"${endpointRoot.value}healthCheck" -> HttpRoutes.of[F] { case GET -> Root =>
         Ok.apply(s"OK")
@@ -119,6 +119,8 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
           cmdRunner.processRequest(req)
         }
       )
-    ).orNotFound
+    )
 
+  def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
+    buildHttpRoutes(cmdRunner).orNotFound
 }
