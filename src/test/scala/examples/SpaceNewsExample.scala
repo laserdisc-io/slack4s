@@ -10,8 +10,8 @@ import io.laserdisc.slack4s.slashcmd._
 import org.http4s.Method.GET
 import org.http4s.Uri.unsafeFromString
 import org.http4s._
-import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+import org.http4s.ember.client.EmberClientBuilder
 
 import java.time.Instant
 
@@ -67,7 +67,7 @@ object SpaceNewsExample extends IOApp.Simple {
     )
 
   def querySpaceNews(word: String): IO[List[SpaceNewsArticle]] =
-    BlazeClientBuilder[IO].resource.use {
+    EmberClientBuilder.default[IO].build.use {
       _.fetchAs[List[SpaceNewsArticle]](
         Request[IO](
           GET,

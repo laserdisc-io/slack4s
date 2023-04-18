@@ -2,24 +2,24 @@ package io.laserdisc.slack4s.slashcmd
 
 import cats.effect._
 import cats.implicits._
+import com.comcast.ip4s.{IpAddress, IpLiteralSyntax, Port}
 import eu.timepit.refined.auto._
 import io.laserdisc.slack4s.slack.internal.SlackAPIClient
 import io.laserdisc.slack4s.slashcmd.SlashCommandBotBuilder.Defaults
 import io.laserdisc.slack4s.slashcmd.internal.SignatureValidator._
 import io.laserdisc.slack4s.slashcmd.internal._
 import org.http4s._
-import org.http4s.blaze.server._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.server.{Router, ServiceErrorHandler}
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.{Router, Server}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import slack4s.BuildInfo
 
 object SlashCommandBotBuilder {
 
   object Defaults {
-    val BindPort: BindPort         = 8080
-    val BindAddress: BindAddress   = "0.0.0.0"
+    val BindPort: Port             = port"8080"
+    val BindAddress: IpAddress     = ipv4"0.0.0.0"
     val EndpointRoot: EndpointRoot = "/"
   }
 
@@ -29,11 +29,11 @@ object SlashCommandBotBuilder {
 
 class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     signingSecret: SigningSecret,
-    bindPort: BindPort = Defaults.BindPort,
-    bindAddress: BindAddress = Defaults.BindAddress,
+    bindPort: Port = Defaults.BindPort,
+    bindAddress: IpAddress = Defaults.BindAddress,
     endpointRoot: EndpointRoot = Defaults.EndpointRoot,
     commandParser: Option[CommandMapper[F]] = None,
-    http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = (b: BlazeServerBuilder[F]) => b
+    http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F] = (b: EmberServerBuilder[F]) => b
 ) {
   type Self = SlashCommandBotBuilder[F]
 
@@ -44,11 +44,11 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
 
   private[this] def copy(
       signingSecret: SigningSecret = signingSecret,
-      bindPort: BindPort = bindPort,
-      bindAddress: BindAddress = bindAddress,
+      bindPort: Port = bindPort,
+      bindAddress: IpAddress = bindAddress,
       endpointRoot: EndpointRoot = endpointRoot,
       commandParser: Option[CommandMapper[F]] = commandParser,
-      http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F] = http4sBuilder
+      http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F] = http4sBuilder
   ): Self =
     new SlashCommandBotBuilder(
       signingSecret = signingSecret,
@@ -59,55 +59,56 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       http4sBuilder = http4sBuilder
     )
 
-  def withBindOptions(port: BindPort, address: BindAddress = "0.0.0.0"): Self =
+  def withBindOptions(port: Port, address: IpAddress = Defaults.BindAddress): Self =
     copy(bindPort = port, bindAddress = address)
 
   def withEndpointRoot(root: EndpointRoot): Self =
     copy(endpointRoot = root)
 
-  def withHttp4sBuilder(http4sBuilder: BlazeServerBuilder[F] => BlazeServerBuilder[F]): Self =
+  def withHttp4sBuilder(http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F]): Self =
     copy(http4sBuilder = http4sBuilder)
 
   def withCommandMapper(commandParser: CommandMapper[F]): Self =
     copy(commandParser = Some(commandParser))
 
-  final def serveStream: fs2.Stream[F, Unit] =
+  final def serveStream: fs2.Stream[F, Unit] = {
+
+    def mkHttpService(cmdRunner: CommandRunner[F]): fs2.Stream[F, Server] = fs2.Stream
+      .resource(
+        http4sBuilder(
+          EmberServerBuilder
+            .default[F]
+            .withHost(bindAddress)
+            .withPort(bindPort)
+            .withHttpApp(buildHttpApp(cmdRunner))
+            .withErrorHandler(errorHandler)
+        ).build
+      )
+
     fs2.Stream
       .resource(SlackAPIClient.resource[F])
       .evalMap(slackApiClient => CommandRunner[F](slackApiClient, commandParser.getOrElse(CommandMapper.default[F])))
       .flatMap { cmdRunner =>
-        cmdRunner.processBGCommandQueue
-          .concurrently(
-            http4sBuilder(
-              BlazeServerBuilder[F]
-                .bindHttp(bindPort, bindAddress)
-                .withBanner(Banner)
-                .withHttpApp(buildHttpApp(cmdRunner))
-                .withServiceErrorHandler(errorHandler)
-            ).serve
-          )
+        val bgProcessor = cmdRunner.processBGCommandQueue
+        val httpService = mkHttpService(cmdRunner)
+        bgProcessor.concurrently(httpService)
       }
+  }
 
   def serve: F[Unit] = serveStream.compile.drain
 
-  final val Banner = {
-    val msg = s"Starting slack4s v${BuildInfo.version}"
-    Seq(msg.map(_ => '-'), msg, msg.map(_ => '-'))
+  def errorHandler: PartialFunction[Throwable, F[Response[F]]] = {
+    case ex: AuthError =>
+      // log the error, but don't expose exception details to http
+      logger
+        .warn(ex)(s"""ERROR-AUTH $ex""")
+        .as(Response(Status.Unauthorized))
+
+    case ex: Throwable =>
+      logger
+        .error(ex)(s"""ERROR-UNHANDLED $ex""")
+        .flatMap(_ => InternalServerError("Something went wrong, see the logs."))
   }
-
-  def errorHandler: ServiceErrorHandler[F] =
-    req => {
-      case ex: AuthError =>
-        // log the error, but don't expose exception details to http
-        logger
-          .warn(s"""ERROR-AUTH $ex addr:${req.remoteAddr.getOrElse("<unknown>")}""")
-          .as(Response(Status.Unauthorized))
-
-      case ex: Throwable =>
-        logger
-          .error(ex)(s"""ERROR-UNHANDLED $ex addr:${req.remoteAddr.getOrElse("<unknown>")}""")
-          .flatMap(_ => InternalServerError("Something went wrong, see the logs."))
-    }
 
   def buildHttpRoutes(cmdRunner: CommandRunner[F]): HttpRoutes[F] =
     Router(
