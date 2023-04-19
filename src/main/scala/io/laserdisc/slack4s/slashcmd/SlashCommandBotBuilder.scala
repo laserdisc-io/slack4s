@@ -77,31 +77,29 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   def withCommandMapper(commandParser: CommandMapper[F]): Self =
     copy(commandParser = Some(commandParser))
 
-  final def serveStream: fs2.Stream[F, Unit] = {
+  final def build: Resource[F, Server] = {
 
-    def mkHttpService(cmdRunner: CommandRunner[F]): fs2.Stream[F, Server] = fs2.Stream
-      .resource(
-        http4sBuilder(
-          EmberServerBuilder
-            .default[F]
-            .withHost(bindAddress)
-            .withPort(bindPort)
-            .withHttpApp(buildHttpApp(cmdRunner, additionalRoutes))
-            .withErrorHandler(errorHandler)
-        ).build
-      )
+    def mkHttpService(cmdRunner: CommandRunner[F]): Resource[F, Server] =
+      http4sBuilder(
+        EmberServerBuilder
+          .default[F]
+          .withHost(bindAddress)
+          .withPort(bindPort)
+          .withHttpApp(buildHttpApp(cmdRunner, additionalRoutes))
+          .withErrorHandler(errorHandler)
+      ).build
 
-    fs2.Stream
-      .resource(SlackAPIClient.resource[F])
-      .evalMap(slackApiClient => CommandRunner[F](slackApiClient, commandParser.getOrElse(CommandMapper.default[F])))
-      .flatMap { cmdRunner =>
-        val bgProcessor = cmdRunner.processBGCommandQueue
-        val httpService = mkHttpService(cmdRunner)
-        bgProcessor.concurrently(httpService)
-      }
+    for {
+      client    <- SlackAPIClient.resource[F]
+      cmdRunner <- Resource.eval(CommandRunner[F](client, commandParser.getOrElse(CommandMapper.default[F])))
+      svc         = mkHttpService(cmdRunner)
+      bgProcessor = Resource.eval(cmdRunner.processBGCommandQueue.compile.drain)
+      both <- Resource.both(svc, bgProcessor)
+    } yield both._1
+
   }
 
-  def serve: F[Unit] = serveStream.compile.drain
+  def run: F[Nothing] = build.useForever
 
   def errorHandler: PartialFunction[Throwable, F[Response[F]]] = {
     case ex: AuthError =>
