@@ -77,6 +77,8 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
   def withCommandMapper(commandParser: CommandMapper[F]): Self =
     copy(commandParser = Some(commandParser))
 
+  final def serve: F[Nothing] = build.useForever
+
   final def build: Resource[F, Server] = {
 
     def mkHttpService(cmdRunner: CommandRunner[F]): Resource[F, Server] =
