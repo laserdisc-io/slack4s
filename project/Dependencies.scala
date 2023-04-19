@@ -1,16 +1,16 @@
-import sbt.Keys.{libraryDependencies, testFrameworks}
 import sbt.*
+import sbt.Keys.{libraryDependencies, testFrameworks}
 
 //noinspection TypeAnnotation
 object Dependencies {
 
   val TestLib = Seq(
+    testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"         % "0.7.29" % Test,
-      "org.mockito"    % "mockito-core"  % "5.3.0"  % Test,
+      "org.scalameta" %% "munit"         % "0.7.29",
+      "org.mockito"    % "mockito-core"  % "5.3.0",
       "org.gnieh"     %% "diffson-circe" % "4.4.0"
-    ),
-    testFrameworks += new TestFramework("munit.Framework")
+    ).map(_ % Test)
   )
 
   val Slack = Seq(
@@ -45,6 +45,7 @@ object Dependencies {
   val Circe = Seq(
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core"           % CirceVersion,
+      "io.circe" %% "circe-parser"         % CirceVersion,
       "io.circe" %% "circe-generic"        % CirceVersion,
       "io.circe" %% "circe-generic-extras" % "0.14.3",
       "io.circe" %% "circe-optics"         % "0.14.1"
