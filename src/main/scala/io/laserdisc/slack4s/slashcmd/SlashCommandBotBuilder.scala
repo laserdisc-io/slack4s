@@ -33,6 +33,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
     bindAddress: IpAddress = Defaults.BindAddress,
     endpointRoot: EndpointRoot = Defaults.EndpointRoot,
     commandParser: Option[CommandMapper[F]] = None,
+    additionalRoutes: Option[HttpRoutes[F]] = None,
     http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F] = (b: EmberServerBuilder[F]) => b
 ) {
   type Self = SlashCommandBotBuilder[F]
@@ -48,6 +49,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       bindAddress: IpAddress = bindAddress,
       endpointRoot: EndpointRoot = endpointRoot,
       commandParser: Option[CommandMapper[F]] = commandParser,
+      additionalRoutes: Option[HttpRoutes[F]] = additionalRoutes,
       http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F] = http4sBuilder
   ): Self =
     new SlashCommandBotBuilder(
@@ -56,6 +58,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       bindAddress = bindAddress,
       endpointRoot = endpointRoot,
       commandParser = commandParser,
+      additionalRoutes = additionalRoutes,
       http4sBuilder = http4sBuilder
     )
 
@@ -64,6 +67,9 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
 
   def withEndpointRoot(root: EndpointRoot): Self =
     copy(endpointRoot = root)
+
+  def withAdditionalRoutes(routes: HttpRoutes[F]): Self =
+    copy(additionalRoutes = Some(routes))
 
   def withHttp4sBuilder(http4sBuilder: EmberServerBuilder[F] => EmberServerBuilder[F]): Self =
     copy(http4sBuilder = http4sBuilder)
@@ -80,7 +86,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
             .default[F]
             .withHost(bindAddress)
             .withPort(bindPort)
-            .withHttpApp(buildHttpApp(cmdRunner))
+            .withHttpApp(buildHttpApp(cmdRunner, additionalRoutes))
             .withErrorHandler(errorHandler)
         ).build
       )
@@ -110,8 +116,9 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
         .flatMap(_ => InternalServerError("Something went wrong, see the logs."))
   }
 
-  def buildHttpRoutes(cmdRunner: CommandRunner[F]): HttpRoutes[F] =
-    Router(
+  def buildHttpApp(cmdRunner: CommandRunner[F], additionalRoutes: Option[HttpRoutes[F]] = None): HttpApp[F] = {
+
+    val botRoutes = Router(
       s"${endpointRoot.value}healthCheck" -> HttpRoutes.of[F] { case GET -> Root =>
         Ok.apply(s"OK")
       },
@@ -122,6 +129,7 @@ class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
       )
     )
 
-  def buildHttpApp(cmdRunner: CommandRunner[F]): HttpApp[F] =
-    buildHttpRoutes(cmdRunner).orNotFound
+    (botRoutes <+> additionalRoutes.getOrElse(HttpRoutes.empty[F])).orNotFound
+  }
+
 }
