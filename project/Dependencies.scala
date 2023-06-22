@@ -18,7 +18,7 @@ object Dependencies {
   )
 
   val Refined = Seq(
-    libraryDependencies += "eu.timepit" %% "refined" % "0.10.3"
+    libraryDependencies += "eu.timepit" %% "refined" % "0.11.0"
   )
 
   val Logging = Seq(
