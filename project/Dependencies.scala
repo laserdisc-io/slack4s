@@ -8,30 +8,30 @@ object Dependencies {
     testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29",
-      "org.mockito"    % "mockito-core"  % "5.3.0",
+      "org.mockito"    % "mockito-core"  % "5.4.0",
       "org.gnieh"     %% "diffson-circe" % "4.4.0"
     ).map(_ % Test)
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.29.2"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.30.0"
   )
 
   val Refined = Seq(
-    libraryDependencies += "eu.timepit" %% "refined" % "0.10.3"
+    libraryDependencies += "eu.timepit" %% "refined" % "0.11.0"
   )
 
   val Logging = Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "log4cats-slf4j"  % "2.5.0",
-      "ch.qos.logback" % "logback-classic" % "1.4.6" % Test,
-      "ch.qos.logback" % "logback-core"    % "1.4.6" % Test,
+      "org.typelevel" %% "log4cats-slf4j"  % "2.6.0",
+      "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
+      "ch.qos.logback" % "logback-core"    % "1.4.8" % Test,
       "org.slf4j"      % "jcl-over-slf4j"  % "2.0.7" % Test,
       "org.slf4j"      % "jul-to-slf4j"    % "2.0.7" % Test
     )
   )
 
-  val Http4sVersion = "0.23.18"
+  val Http4sVersion = "0.23.23"
   val Http4s = Seq(
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl"          % Http4sVersion,

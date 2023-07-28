@@ -4,6 +4,7 @@ import cats.effect._
 import cats.implicits._
 import com.comcast.ip4s.{IpAddress, IpLiteralSyntax, Port}
 import eu.timepit.refined.auto._
+import fs2.io.net.Network
 import io.laserdisc.slack4s.slack.internal.SlackAPIClient
 import io.laserdisc.slack4s.slashcmd.SlashCommandBotBuilder.Defaults
 import io.laserdisc.slack4s.slashcmd.internal.SignatureValidator._
@@ -23,11 +24,11 @@ object SlashCommandBotBuilder {
     val EndpointRoot: EndpointRoot = "/"
   }
 
-  def apply[F[_]: Async](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
+  def apply[F[_]: Async: Network](signingSecret: SigningSecret): SlashCommandBotBuilder[F] =
     new SlashCommandBotBuilder[F](signingSecret = signingSecret)
 }
 
-class SlashCommandBotBuilder[F[_]: Async] private[slashcmd] (
+class SlashCommandBotBuilder[F[_]: Async: Network] private[slashcmd] (
     signingSecret: SigningSecret,
     bindPort: Port = Defaults.BindPort,
     bindAddress: IpAddress = Defaults.BindAddress,
