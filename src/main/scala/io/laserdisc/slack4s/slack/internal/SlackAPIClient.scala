@@ -3,6 +3,7 @@ package io.laserdisc.slack4s.slack.internal
 import cats.effect.{Async, Ref, Resource}
 import cats.implicits._
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
+import fs2.io.net.Network
 import org.http4s.client.Client
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.{Method, Request, Uri}
@@ -10,7 +11,7 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object SlackAPIClient {
 
-  def resource[F[_]: Async]: Resource[F, SlackAPIClientImpl[F]] =
+  def resource[F[_]: Async: Network]: Resource[F, SlackAPIClientImpl[F]] =
     for {
       httpClient <- EmberClientBuilder.default[F].build
       client = SlackAPIClientImpl(httpClient)
