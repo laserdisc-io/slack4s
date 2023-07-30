@@ -3,14 +3,13 @@ package io.laserdisc.slack4s.slack.internal
 import cats.effect.unsafe.implicits.global
 import cats.effect.{IO, Resource}
 import io.circe.Json
-import io.circe.optics.JsonPath.root
-import io.laserdisc.slack4s.slack._
+import io.laserdisc.slack4s.slack.*
 import io.laserdisc.slack4s.slashcmd.URL
 import munit.FunSuite
 import org.http4s.Response
 import org.http4s.circe.jsonDecoder
 import org.http4s.client.Client
-import org.http4s.implicits.http4sLiteralsSyntax
+import org.http4s.implicits.*
 
 class SlackAPIClientTest extends FunSuite {
 
@@ -30,8 +29,9 @@ class SlackAPIClientTest extends FunSuite {
           /* we're not testing the whole set of message codecs here, but we do want to ensure that
            * the codecs are being invoked.  We purposefully choose a nested value at particular
            * location that also ensures that slack's preferred JSON style (snake_case) is used. */
-          val json        = req.as[Json].unsafeRunSync()
-          val firstImgURL = root.blocks.each.accessory.image_url.string.getAll(json).headOption
+          val json = req.as[Json].unsafeRunSync()
+
+          val firstImgURL = json.hcursor.downField("blocks").downArray.downField("accessory").downField("image_url").as[String].toOption
 
           assertEquals(
             firstImgURL,

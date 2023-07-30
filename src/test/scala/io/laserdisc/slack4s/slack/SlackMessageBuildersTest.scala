@@ -1,11 +1,11 @@
 package io.laserdisc.slack4s.slack
 
-import diffson._
-import diffson.circe._
+import diffson.*
+import diffson.circe.*
 import diffson.jsonpatch.JsonPatch
-import diffson.jsonpatch.simplediff._
-import io.circe.parser._
-import io.circe.syntax._
+import diffson.jsonpatch.simplediff.*
+import io.circe.parser.*
+import io.circe.syntax.*
 import io.laserdisc.slack4s.slack.internal.postMsgReqCirceEncoder
 import io.laserdisc.slack4s.slashcmd.URL
 import munit.FunSuite

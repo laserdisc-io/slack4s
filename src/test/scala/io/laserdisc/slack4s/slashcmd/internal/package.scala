@@ -4,7 +4,7 @@ import cats.effect.IO
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import io.circe.Decoder
 import org.http4s.Response
-import org.http4s.circe.CirceEntityCodec._
+import org.http4s.circe.CirceEntityCodec.*
 
 package object internal {
 

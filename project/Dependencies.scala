@@ -21,6 +21,10 @@ object Dependencies {
     libraryDependencies += "eu.timepit" %% "refined" % "0.11.0"
   )
 
+  val NewTypes = Seq(
+    libraryDependencies += "io.monix" %% "newtypes-core" % "0.2.3"
+  )
+
   val Logging = Seq(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "log4cats-slf4j"  % "2.6.0",
@@ -44,11 +48,10 @@ object Dependencies {
   val CirceVersion = "0.14.5"
   val Circe = Seq(
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core"           % CirceVersion,
-      "io.circe" %% "circe-parser"         % CirceVersion,
-      "io.circe" %% "circe-generic"        % CirceVersion,
-      "io.circe" %% "circe-generic-extras" % "0.14.3",
-      "io.circe" %% "circe-optics"         % "0.14.1"
+      "io.circe" %% "circe-core"   % CirceVersion,
+      "io.circe" %% "circe-parser" % CirceVersion
+//      "io.circe" %% "circe-generic"        % CirceVersion,
+//      "io.circe" %% "circe-optics"         % "0.14.1"
     )
   )
 

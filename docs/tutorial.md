@@ -104,13 +104,12 @@ Following the instructions on the [main README](../README.md), let's create a sl
 
 ```scala
 import cats.effect.{IO, IOApp}
-import eu.timepit.refined.auto._
-import io.laserdisc.slack4s.slashcmd._
+import io.laserdisc.slack4s.slashcmd.*
 
 object MySlackBot extends IOApp.Simple {
 
   // please don't hardcode secrets, this is just a demo
-  val secret: SigningSecret = "7e16-----redacted------68c2c"  
+  val secret: SigningSecret = SigningSecret.unsfeFrom("7e16-----redacted------68c2c")  
   
   override def run: IO[Unit] = SlashCommandBotBuilder[IO](secret).serve
 
@@ -145,10 +144,10 @@ If you're still getting `dispatch_failed` errors:
 We're going to use a simple [http4s](https://http4s.org/) client to make the API call, and [circe](https://circe.github.io/circe/) to decode the result.
 
 ```scala
-import io.circe.generic.auto._
+import io.circe.generic.auto.*
 import org.http4s.Method.GET
 import org.http4s.Uri.unsafeFromString
-import org.http4s._
+import org.http4s.*
 import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
@@ -185,7 +184,7 @@ as well as an interactive tool for quickly prototyping layouts.
 ```scala
 
 // helper functions for building the various block types in the slack LayoutBlock SDK
-import io.laserdisc.slack4s.slack._
+import io.laserdisc.slack4s.slack.*
 
 def formatNewsArticle(article: SpaceNewsArticle): Seq[LayoutBlock] =
   Seq(

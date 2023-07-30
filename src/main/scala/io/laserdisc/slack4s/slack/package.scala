@@ -2,12 +2,12 @@ package io.laserdisc.slack4s
 
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
-import com.slack.api.model.block._
-import com.slack.api.model.block.composition._
-import com.slack.api.model.block.element._
+import com.slack.api.model.block.*
+import com.slack.api.model.block.composition.*
+import com.slack.api.model.block.element.*
 import io.laserdisc.slack4s.slashcmd.URL
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
 package object slack {

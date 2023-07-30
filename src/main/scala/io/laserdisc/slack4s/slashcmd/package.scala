@@ -5,8 +5,21 @@ import eu.timepit.refined.api.{Refined, RefinedTypeOps}
 import eu.timepit.refined.numeric.Positive
 import eu.timepit.refined.string.{MatchesRegex, Url}
 import eu.timepit.refined.types.string.NonEmptyString
+import monix.newtypes.{BuildFailure, NewtypeValidated}
 
 package object slashcmd {
+
+  type EmailAddress = EmailAddress.Type
+
+  object EmailAddress extends NewtypeValidated[String] {
+    def apply(v: String): Either[BuildFailure[Type], Type] =
+      if (v.contains("@"))
+        Right(unsafeCoerce(v))
+      else
+        Left(BuildFailure("missing @"))
+  }
+
+  val k = EmailAddress("yo hoo")
 
   final type SigningSecret = NonEmptyString
   final type LogToken      = String Refined MatchesRegex["[A-Za-z0-9\\-\\_]+"]

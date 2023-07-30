@@ -1,11 +1,10 @@
 package io.laserdisc.slack4s.slashcmd
 
 import cats.effect.Sync
-import cats.implicits._
+import cats.implicits.*
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
-import eu.timepit.refined.auto._
 import io.laserdisc.slack4s.internal.ProjectRepo
-import io.laserdisc.slack4s.slack.canned._
+import io.laserdisc.slack4s.slack.canned.*
 import org.typelevel.log4cats.slf4j.Slf4jLogger.getLogger
 
 object CommandMapper {
@@ -21,7 +20,7 @@ object CommandMapper {
             )
             .as(helloFromSlack4s(payload)),
           responseType = Immediate,
-          logId = "GETTING-STARTED"
+          logId = LogToken.unsafeFrom("GETTING-STARTED")
         )
       }
   // $COVERAGE-ON$

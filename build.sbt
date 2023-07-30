@@ -1,4 +1,8 @@
-ThisBuild / scalaVersion := "2.13.11"
+lazy val scala213               = "2.13.11"
+lazy val scala3                 = "3.3.0"
+lazy val supportedScalaVersions = List(scala213, scala3)
+ThisBuild / crossScalaVersions := supportedScalaVersions
+ThisBuild / scalaVersion       := scala213
 
 lazy val publishSettings = Seq(
   Test / publishArtifact := false,
@@ -11,7 +15,6 @@ lazy val publishSettings = Seq(
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/laserdisc-io/slack4s/tree/master"),
-      "scm:git:git@github.com:laserdisc-io/slack4s.git",
       "scm:git:git@github.com:laserdisc-io/slack4s.git"
     )
   ),
@@ -26,19 +29,49 @@ lazy val root = project
     name := "slack4s",
     publishSettings,
     Seq(
-      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
+      libraryDependencies ++= Seq(
+        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full)),
+        compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+      ).filterNot(_ => scalaVersion.value.startsWith("3.")),
       scalacOptions ++= Seq(
+        "-deprecation",
         "-encoding",
         "UTF-8",
-        "-deprecation",
-        "-unchecked",
         "-feature",
-        "-language:higherKinds",
-        "-language:implicitConversions",
-        "-language:postfixOps",
-        "-Xlint:_,-byname-implicit", // see https://github.com/scala/bug/issues/12072
+        "-language:existentials,experimental.macros,higherKinds,implicitConversions,postfixOps",
+        "-unchecked",
         "-Xfatal-warnings"
-      )
+      ),
+      scalacOptions ++= {
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, minor)) if minor >= 13 =>
+            Seq(
+              "-Xlint:-unused,_",
+              "-Ywarn-numeric-widen",
+              "-Ywarn-value-discard",
+              "-Ywarn-unused:implicits",
+              "-Ywarn-unused:imports",
+              "-Xsource:3",
+              "-Xlint:-byname-implicit",
+              "-P:kind-projector:underscore-placeholders",
+              "-Xlint",
+              "-Ywarn-macros:after"
+            )
+          case _ => Seq.empty
+        }
+      },
+      scalacOptions ++= {
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((3, _)) =>
+            Seq(
+              "-Ykind-projector:underscores",
+              "-source:future",
+              "-language:adhocExtensions",
+              "-Wconf:msg=`= _` has been deprecated; use `= uninitialized` instead.:s"
+            )
+          case _ => Seq.empty
+        }
+      }
     ),
     Test / fork := true,
     // ------------------------- deps -------------------------
@@ -46,6 +79,7 @@ lazy val root = project
     Dependencies.TestLib,
     Dependencies.Circe,
     Dependencies.Refined,
+    Dependencies.NewTypes,
     Dependencies.Logging,
     Dependencies.Http4s,
     Dependencies.Slack,

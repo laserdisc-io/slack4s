@@ -1,7 +1,6 @@
 package io.laserdisc.slack4s.slashcmd
 
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
-import eu.timepit.refined.auto._
 
 /** The description of a Command - an effect to be evaluated, providing a response (along with instructions on how to deliver the response.
   *
@@ -19,7 +18,7 @@ import eu.timepit.refined.auto._
 case class Command[F[_]](
     handler: F[ChatPostMessageRequest],
     responseType: ResponseType = Delayed,
-    logId: LogToken = "NA"
+    logId: LogToken = LogToken.unsafeFrom("NA")
 )
 
 /** Used by the http4s middleware when building a validated `AuthedRequest`

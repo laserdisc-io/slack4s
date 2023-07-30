@@ -1,14 +1,14 @@
 package io.laserdisc.slack4s.slashcmd.internal
 import cats.data.{Kleisli, OptionT}
 import cats.effect.{Async, Sync}
-import cats.implicits._
+import cats.implicits.*
 import com.slack.api.app_backend.SlackSignature
-import com.slack.api.app_backend.SlackSignature.HeaderNames._
+import com.slack.api.app_backend.SlackSignature.HeaderNames.*
 import com.slack.api.app_backend.SlackSignature.Verifier
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
-import io.laserdisc.slack4s.slack.internal._
-import io.laserdisc.slack4s.slashcmd._
-import org.http4s._
+import io.laserdisc.slack4s.slack.internal.*
+import io.laserdisc.slack4s.slashcmd.*
+import org.http4s.*
 import org.http4s.server.AuthMiddleware
 import org.typelevel.ci.CIString
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -18,17 +18,17 @@ object SignatureValidator {
 
   type Validated[T] = Either[AuthError, T]
 
-  private[this] def forbidden[F[_]: Sync]: AuthedRoutes[String, F] =
+  private def forbidden[F[_]: Sync]: AuthedRoutes[String, F] =
     Kleisli(_ => OptionT.pure(Response[F](Status.Unauthorized)))
 
   def withValidSignature[F[_]: Async](
-      signingSecret: String
+      signingSecret: SigningSecret
   ): AuthMiddleware[F, SlackUser] = {
 
     val logger = Slf4jLogger.getLogger[F]
 
     val slackSignatureVerifier = new Verifier(
-      new SlackSignature.Generator(signingSecret)
+      new SlackSignature.Generator(signingSecret.value)
     )
 
     def getRequiredHeader(req: Request[F], header: String): F[String] =
