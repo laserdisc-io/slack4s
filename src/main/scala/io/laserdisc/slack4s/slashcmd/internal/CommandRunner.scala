@@ -2,17 +2,17 @@ package io.laserdisc.slack4s.slashcmd.internal
 
 import cats.effect.Async
 import cats.effect.std.Queue
-import cats.implicits._
+import cats.implicits.*
 import com.slack.api.app_backend.slash_commands.payload.SlashCommandPayload
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import fs2.Stream
-import io.circe.syntax._
-import io.laserdisc.slack4s.slack._
-import io.laserdisc.slack4s.slack.canned._
-import io.laserdisc.slack4s.slack.internal._
-import io.laserdisc.slack4s.slashcmd._
+import io.circe.syntax.*
+import io.laserdisc.slack4s.slack.*
+import io.laserdisc.slack4s.slack.canned.*
+import io.laserdisc.slack4s.slack.internal.*
+import io.laserdisc.slack4s.slashcmd.*
 import org.http4s.FormDataDecoder.formEntityDecoder
-import org.http4s._
+import org.http4s.*
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object CommandRunner {
@@ -37,10 +37,10 @@ class CommandRunnerImpl[F[_]: Async](
     queue: Queue[F, (SlashCommandPayload, Command[F])]
 ) extends CommandRunner[F] {
 
-  private[this] val logger = Slf4jLogger.getLogger
+  private val logger = Slf4jLogger.getLogger
 
   // log but otherwise ignore failures to send messages to slack
-  private[this] def respond(
+  private def respond(
       payload: SlashCommandPayload,
       command: Command[F],
       response: ChatPostMessageRequest
@@ -54,7 +54,7 @@ class CommandRunnerImpl[F[_]: Async](
           respondSomethingWentWrong(payload)
       }
 
-  private[this] def respondSomethingWentWrong(payload: SlashCommandPayload): F[Unit] = {
+  private def respondSomethingWentWrong(payload: SlashCommandPayload): F[Unit] = {
 
     val response = somethingWentWrong(payload)
 

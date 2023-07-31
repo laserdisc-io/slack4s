@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         scala:
-          - 2.13.10
+          - 2.13.11
+          - 3.3.0
         java:
           - corretto@1.11
           - corretto@1.17

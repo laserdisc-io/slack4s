@@ -1,7 +1,7 @@
 package io.laserdisc.slack4s.slack.internal
 
 import cats.effect.{Async, Ref, Resource}
-import cats.implicits._
+import cats.implicits.*
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import fs2.io.net.Network
 import org.http4s.client.Client
@@ -32,7 +32,7 @@ case class SlackResponseAccepted()
 
 case class SlackAPIClientImpl[F[_]: Async](httpClient: Client[F]) extends SlackAPIClient[F] {
 
-  private[this] val logger = Slf4jLogger.getLogger[F]
+  private val logger = Slf4jLogger.getLogger[F]
 
   override def respond(url: String, input: ChatPostMessageRequest): F[Unit] =
     for {

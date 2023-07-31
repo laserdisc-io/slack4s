@@ -35,12 +35,11 @@ With your [signing secret](https://api.slack.com/authentication/verifying-reques
 
 ```scala
 import cats.effect.{IO, IOApp}
-import eu.timepit.refined.auto._
-import io.laserdisc.slack4s.slashcmd._
+import io.laserdisc.slack4s.slashcmd.*
 
 object MySlackBot extends IOApp.Simple {
 
-  val secret: SigningSecret = "your-signing-secret" // demo purposes - please don't hardcode secrets  
+  val secret: SigningSecret = SigningSecret.unsafeFrom("your-signing-secret") // demo purposes - please don't hardcode secrets  
   
   override def run: IO[Unit] = SlashCommandBotBuilder[IO](secret).serve
 

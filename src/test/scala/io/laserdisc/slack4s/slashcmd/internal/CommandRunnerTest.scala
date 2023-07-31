@@ -1,9 +1,9 @@
 package io.laserdisc.slack4s.slashcmd.internal
 
 import cats.effect.IO
-import io.laserdisc.slack4s.slack._
-import io.laserdisc.slack4s.slashcmd._
-import org.http4s.circe.CirceEntityCodec._
+import io.laserdisc.slack4s.slack.*
+import io.laserdisc.slack4s.slashcmd.*
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.{Response, Status}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
