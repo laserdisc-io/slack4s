@@ -30,8 +30,8 @@ object Dependencies {
       "org.typelevel" %% "log4cats-slf4j"  % "2.6.0",
       "ch.qos.logback" % "logback-classic" % "1.4.8" % Test,
       "ch.qos.logback" % "logback-core"    % "1.4.8" % Test,
-      "org.slf4j"      % "jcl-over-slf4j"  % "2.0.7" % Test,
-      "org.slf4j"      % "jul-to-slf4j"    % "2.0.7" % Test
+      "org.slf4j"      % "jcl-over-slf4j"  % "2.0.9" % Test,
+      "org.slf4j"      % "jul-to-slf4j"    % "2.0.9" % Test
     )
   )
 
