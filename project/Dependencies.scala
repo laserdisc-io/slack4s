@@ -8,7 +8,7 @@ object Dependencies {
     testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit"         % "0.7.29",
-      "org.mockito"    % "mockito-core"  % "5.4.0",
+      "org.mockito"    % "mockito-core"  % "5.9.0",
       "org.gnieh"     %% "diffson-circe" % "4.4.0"
     ).map(_ % Test)
   )
