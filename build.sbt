@@ -30,7 +30,7 @@ lazy val root = project
     publishSettings,
     Seq(
       libraryDependencies ++= Seq(
-        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full)),
+        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.3").cross(CrossVersion.full)),
         compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
       ).filterNot(_ => scalaVersion.value.startsWith("3.")),
       scalacOptions ++= Seq(
