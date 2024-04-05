@@ -1,5 +1,5 @@
-lazy val scala213               = "2.13.11"
-lazy val scala3                 = "3.3.0"
+lazy val scala213               = "2.13.13"
+lazy val scala3                 = "3.3.3"
 lazy val supportedScalaVersions = List(scala213, scala3)
 ThisBuild / crossScalaVersions := supportedScalaVersions
 ThisBuild / scalaVersion       := scala213
@@ -30,7 +30,7 @@ lazy val root = project
     publishSettings,
     Seq(
       libraryDependencies ++= Seq(
-        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full)),
+        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.3").cross(CrossVersion.full)),
         compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
       ).filterNot(_ => scalaVersion.value.startsWith("3.")),
       scalacOptions ++= Seq(
