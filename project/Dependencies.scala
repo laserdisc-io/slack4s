@@ -18,7 +18,7 @@ object Dependencies {
   )
 
   val Refined = Seq(
-    libraryDependencies += "eu.timepit" %% "refined" % "0.11.1"
+    libraryDependencies += "eu.timepit" %% "refined" % "0.11.2"
   )
 
   val NewTypes = Seq(
