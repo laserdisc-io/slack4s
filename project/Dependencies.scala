@@ -45,7 +45,7 @@ object Dependencies {
     )
   )
 
-  val CirceVersion = "0.14.6"
+  val CirceVersion = "0.14.9"
   val Circe = Seq(
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core"   % CirceVersion,
