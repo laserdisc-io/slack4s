@@ -22,7 +22,7 @@ object Dependencies {
   )
 
   val NewTypes = Seq(
-    libraryDependencies += "io.monix" %% "newtypes-core" % "0.2.3"
+    libraryDependencies += "io.monix" %% "newtypes-core" % "0.3.0"
   )
 
   val Logging = Seq(
