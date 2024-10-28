@@ -14,7 +14,7 @@ object Dependencies {
   )
 
   val Slack = Seq(
-    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.43.1"
+    libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.44.1"
   )
 
   val Refined = Seq(
