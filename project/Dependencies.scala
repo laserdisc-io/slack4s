@@ -21,8 +21,8 @@ object Dependencies {
 
   val Logging = libraryDependencies ++= Seq(
     "org.typelevel" %% "log4cats-slf4j"  % "2.7.0",
-    "ch.qos.logback" % "logback-classic" % "1.5.12" % Test,
-    "ch.qos.logback" % "logback-core"    % "1.5.12" % Test,
+    "ch.qos.logback" % "logback-classic" % "1.5.16" % Test,
+    "ch.qos.logback" % "logback-core"    % "1.5.16" % Test,
     "org.slf4j"      % "jcl-over-slf4j"  % "2.0.16" % Test,
     "org.slf4j"      % "jul-to-slf4j"    % "2.0.16" % Test
   )
