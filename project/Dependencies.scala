@@ -13,7 +13,7 @@ object Dependencies {
     ).map(_ % Test)
   )
 
-  val Slack = libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.44.2"
+  val Slack = libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.45.1"
 
   val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.2"
 
