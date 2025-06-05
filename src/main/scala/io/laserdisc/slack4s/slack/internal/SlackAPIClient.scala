@@ -36,7 +36,7 @@ case class SlackAPIClientImpl[F[_]: Async](httpClient: Client[F]) extends SlackA
 
   override def respond(url: String, input: ChatPostMessageRequest): F[Unit] =
     for {
-      _ <- logger.debug(s"SLACK-RESPOND-REQ url:$url input:$input")
+      _   <- logger.debug(s"SLACK-RESPOND-REQ url:$url input:$input")
       res <- httpClient.expect[SlackResponseAccepted](
         Request[F](
           Method.POST,

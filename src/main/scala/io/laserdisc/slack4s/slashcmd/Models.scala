@@ -29,12 +29,12 @@ case class Command[F[_]](
   */
 case class SlackUser(teamId: String, userId: String)
 
-sealed trait AuthError extends Throwable
+sealed trait AuthError                       extends Throwable
 case class MissingHeader(headerName: String) extends AuthError {
   override def getMessage: String = s"Missing header: $headerName"
 }
 
-sealed trait PayloadError extends Throwable
+sealed trait PayloadError                     extends Throwable
 case class MissingPayloadField(error: String) extends PayloadError {
   override def getMessage: String = s"Missing payload field error: $error"
 }

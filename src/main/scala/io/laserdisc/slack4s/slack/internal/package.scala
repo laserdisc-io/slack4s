@@ -44,7 +44,7 @@ package object internal {
   // slack responds with a body of just "ok" on success
   implicit def responseAcceptedDecoder[F[_]: Async]: EntityDecoder[F, SlackResponseAccepted] =
     EntityDecoder.text.map {
-      case "ok" => SlackResponseAccepted()
+      case "ok"       => SlackResponseAccepted()
       case unexpected =>
         throw new IllegalArgumentException(s"Expected 'ok' in body, got $unexpected")
     }
