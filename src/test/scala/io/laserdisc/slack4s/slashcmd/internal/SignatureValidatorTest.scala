@@ -25,7 +25,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
     val payload     = testPayloadForm(text = "text", responseUrl = "responseUrl", userId = "userId", teamId = "teamId")
     val signatureTS = System.currentTimeMillis().toString
-    val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
+    val signature   = new SlackSignature.Generator(DefaultTestSigningSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
 
     val req = POST(
@@ -46,7 +46,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
     val payload     = UrlForm("text" -> "whatever")
     val signatureTS = System.currentTimeMillis().toString
-    val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
+    val signature   = new SlackSignature.Generator(DefaultTestSigningSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
 
     val req = POST(
@@ -85,7 +85,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
     val payload     = UrlForm("text" -> "whatever")
     val signatureTS = System.currentTimeMillis().toString
-    val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
+    val signature   = new SlackSignature.Generator(DefaultTestSigningSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
 
     val req = POST(
@@ -125,7 +125,7 @@ class SignatureValidatorTest extends SlashCommandSuite {
 
     val payload     = UrlForm("text" -> "whatever")
     val signatureTS = System.currentTimeMillis().toString
-    val signature = new SlackSignature.Generator(DefaultTestSigningSecret.value)
+    val signature   = new SlackSignature.Generator(DefaultTestSigningSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
 
     val req = POST(
