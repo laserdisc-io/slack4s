@@ -43,7 +43,7 @@ object SignatureValidator {
         sig      <- getRequiredHeader(request, X_SLACK_SIGNATURE)
         bodyText <- request.as[String]
         payload  <- request.attemptAs[SlashCommandPayload].value
-        res <-
+        res      <-
           payload match {
             case Left(error) =>
               logger

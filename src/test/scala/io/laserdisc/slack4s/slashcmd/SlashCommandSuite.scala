@@ -36,7 +36,7 @@ trait SlashCommandSuite extends FunSuite {
     val payload = testPayloadForm(text = text, responseUrl = responseURL, userId = userID, teamId = teamID)
 
     val signatureTS = currentTimeMS.toString
-    val signature = new SlackSignature.Generator(signingSecret.value)
+    val signature   = new SlackSignature.Generator(signingSecret.value)
       .generate(signatureTS, UrlForm.encodeString(Charset.`UTF-8`)(payload))
 
     POST(

@@ -103,7 +103,7 @@ class CommandRunnerImpl[F[_]: Async](
       for {
         _   <- logger.info(s"PARSE-CMD cmdId=${payload.requestId}  payload:'$payload'")
         cmd <- mapper(payload)
-        _ <- logger.info(
+        _   <- logger.info(
           s"COMMAND-SELECT cmdId:${cmd.logId} reqId=${payload.requestId} user:${payload.getUserName}(${payload.getUserId}) text:'${payload.getText}' responseType:${cmd.responseType}"
         )
         res <- execute(payload, cmd)
