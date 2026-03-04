@@ -17,7 +17,7 @@ object Dependencies {
 
   val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.3"
 
-  val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.3.0"
+  val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.4.1"
 
   val Logging = libraryDependencies ++= Seq(
     "org.typelevel" %% "log4cats-slf4j"  % "2.7.1",
