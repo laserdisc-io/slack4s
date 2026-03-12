@@ -20,7 +20,7 @@ object Dependencies {
   val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.3.0"
 
   val Logging = libraryDependencies ++= Seq(
-    "org.typelevel" %% "log4cats-slf4j"  % "2.7.1",
+    "org.typelevel" %% "log4cats-slf4j"  % "2.8.0",
     "ch.qos.logback" % "logback-classic" % "1.5.32" % Test,
     "ch.qos.logback" % "logback-core"    % "1.5.32" % Test,
     "org.slf4j"      % "jcl-over-slf4j"  % "2.0.17" % Test,
