@@ -15,7 +15,7 @@ object Dependencies {
 
   val Slack = libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.47.0"
 
-  val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.3"
+  val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.4"
 
   val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.3.0"
 
