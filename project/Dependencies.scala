@@ -7,24 +7,24 @@ object Dependencies {
   val TestLib = Seq(
     testFrameworks += new TestFramework("munit.Framework"),
     libraryDependencies ++= Seq(
-      "org.scalameta" %% "munit"         % "1.2.2",
-      "org.mockito"    % "mockito-core"  % "5.21.0",
-      "org.gnieh"     %% "diffson-circe" % "4.6.1"
+      "org.scalameta" %% "munit"         % "1.3.3",
+      "org.mockito"    % "mockito-core"  % "5.23.0",
+      "org.gnieh"     %% "diffson-circe" % "4.7.0"
     ).map(_ % Test)
   )
 
-  val Slack = libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.47.0"
+  val Slack = libraryDependencies += "com.slack.api" % "slack-app-backend" % "1.49.0"
 
-  val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.3"
+  val Refined = libraryDependencies += "eu.timepit" %% "refined" % "0.11.4"
 
-  val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.3.0"
+  val NewTypes = libraryDependencies += "io.monix" %% "newtypes-core" % "0.4.1"
 
   val Logging = libraryDependencies ++= Seq(
-    "org.typelevel" %% "log4cats-slf4j"  % "2.7.1",
-    "ch.qos.logback" % "logback-classic" % "1.5.32" % Test,
-    "ch.qos.logback" % "logback-core"    % "1.5.32" % Test,
-    "org.slf4j"      % "jcl-over-slf4j"  % "2.0.17" % Test,
-    "org.slf4j"      % "jul-to-slf4j"    % "2.0.17" % Test
+    "org.typelevel" %% "log4cats-slf4j"  % "2.8.0",
+    "ch.qos.logback" % "logback-classic" % "1.5.37" % Test,
+    "ch.qos.logback" % "logback-core"    % "1.5.37" % Test,
+    "org.slf4j"      % "jcl-over-slf4j"  % "2.0.18" % Test,
+    "org.slf4j"      % "jul-to-slf4j"    % "2.0.18" % Test
   )
 
   val Http4s = libraryDependencies ++= Seq(
@@ -32,9 +32,9 @@ object Dependencies {
     "http4s-ember-server",
     "http4s-ember-client",
     "http4s-circe"
-  ).map("org.http4s" %% _ % "0.23.33")
+  ).map("org.http4s" %% _ % "0.23.34")
 
-  val CirceVersion = "0.14.15"
+  val CirceVersion = "0.14.16"
   val Circe        = libraryDependencies ++= Seq(
     "io.circe" %% "circe-core"   % CirceVersion,
     "io.circe" %% "circe-parser" % CirceVersion

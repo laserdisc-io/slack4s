@@ -1,8 +1,8 @@
-import laserdisc.sbt.CompileTarget.Scala2And3
+import laserdisc.sbt.CompileTarget.{Scala2And3, Scala2And3LTS}
 import laserdisc.sbt.LaserDiscDevelopers.Barry
 
 ThisBuild / laserdiscRepoName      := "slack4s"
-ThisBuild / laserdiscCompileTarget := Scala2And3
+ThisBuild / laserdiscCompileTarget := Scala2And3LTS
 
 lazy val root = project
   .in(file("."))
