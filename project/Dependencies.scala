@@ -34,7 +34,7 @@ object Dependencies {
     "http4s-circe"
   ).map("org.http4s" %% _ % "0.23.34")
 
-  val CirceVersion = "0.14.16"
+  val CirceVersion = "0.14.17"
   val Circe        = libraryDependencies ++= Seq(
     "io.circe" %% "circe-core"   % CirceVersion,
     "io.circe" %% "circe-parser" % CirceVersion
